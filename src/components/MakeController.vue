@@ -1,11 +1,11 @@
 <template>
   <div class="hello">
-    <p class="lead">Below is an example form built entirely with Bootstrap’s form controls. Each required form group has a validation state that can be triggered by attempting to submit the form without completing it.</p>
+    <p class="lead"></p>
     <div class="row">
       <div class="col-md-6 mb-3">
         <h4 class="mb-3">Nombre de la clase del controlador</h4>
-        <label for="clase">Nombre de la clase del controlador</label>
-        <input type="text" class="form-control" id="clase" placeholder="NameController" required v-model="data.clase" @blur="nameController">
+        <label for="name">Nombre de la clase del controlador</label>
+        <input type="text" class="form-control" id="name" placeholder="NameController" required v-model="data.name" @blur="nameController" v-bind:class="{ 'border border-danger': !data.name }">
       </div>
       <div class="col-md-6 mb-3">
         <h4 class="mb-3">Seleccionar tipo de controlador</h4>
@@ -65,20 +65,22 @@ export default {
         type: 'resource',
         route: true,
         force: false,
-        clase: '',
+        name: '',
         model: "",
       },
     };
   },
   methods: {
     submit() {
+      if (!this.data.name) {
+        return;
+      }
       axios({
         method: 'POST',
         url: 'http://localhost/slimapp/artisan/make/controller',
-        data: this.data,
-        // headers: {'X-Requested-With': 'XMLHttpRequest'},
+        data: Object.assign({}, this.config.csrf, this.data),
         headers: {
-          //'Content-Type': 'application/x-www-form-urlencoded',
+          // 'Content-Type': 'application/x-www-form-urlencoded',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
@@ -91,7 +93,10 @@ export default {
         });
     },
     nameController() {
-      this.data.clase = this.$parent.fillName(this.data.clase, 'Controller');
+      if (!this.data.name){
+        return;
+      }
+      this.data.name = this.$parent.fillName(this.data.name, 'Controller');
     },
   },
 };
