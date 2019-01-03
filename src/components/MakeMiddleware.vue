@@ -5,7 +5,7 @@
       <div class="col-md-6 mb-3">
         <h4 class="mb-3">Nombre de la clase del middleware</h4>
         <label for="name">Nombre de la clase del middleware</label>
-        <input type="text" class="form-control" id="name" placeholder="NameMiddelware" required v-model="data.name" @blur="nameMiddelware" v-bind:class="{ 'border border-danger': !data.name }">
+        <input type="text" class="form-control" id="name" placeholder="NameMiddleware" required v-model="data.name" @blur="nameMiddleware" v-bind:class="{ 'border border-danger': !data.name }">
       </div>
     </div>
     <div class="row">
@@ -29,12 +29,12 @@
 import axios from 'axios';
 
 export default {
-  name: 'MakeMiddelware',
+  name: 'MakeMiddleware',
   props: ['config'],
   data() {
     return {
       data: {
-        route: true,
+        force: false,
         name: '',
       },
     };
@@ -46,7 +46,7 @@ export default {
       }
       axios({
         method: 'POST',
-        url: 'artisan/make/middleware',
+        url: 'http://localhost/slimapp/artisan/make/middleware',
         data: Object.assign({}, this.config.csrf, this.data),
         headers: {
           'Content-Type': 'application/json',
@@ -60,11 +60,11 @@ export default {
           console.log(error);
         });
     },
-    nameMiddelware() {
-      if (!this.data.name){
+    nameMiddleware() {
+      if (!this.data.name) {
         return;
       }
-      this.data.name = this.$parent.fillName(this.data.name, 'Middelware');
+      this.data.name = this.$parent.fillName(this.data.name, 'Middleware');
     },
   },
 };
