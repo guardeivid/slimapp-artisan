@@ -16,7 +16,7 @@
             <div class="sidebar-sticky">
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <router-link to="/" class="nav-link">
+                  <router-link to="artisan" class="nav-link">
                     <span data-feather="home"></span>
                     Dashboard
                   </router-link>
@@ -61,28 +61,28 @@
               </h6>
               <ul class="nav flex-column mb-2">
                 <li class="nav-item">
-                  <router-link to="/make/controller" class="nav-link">
+                  <router-link to="/artisan/make/controller" class="nav-link">
                     <span data-feather="file-text"></span>
                     Controller
                   </router-link>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
+                  <router-link to="/artisan/make/model" class="nav-link">
                     <span data-feather="file-text"></span>
                     Model
-                  </a>
+                  </router-link>
                 </li>
                 <li class="nav-item">
-                  <router-link to="/make/middleware" class="nav-link">
+                  <router-link to="/artisan/make/middleware" class="nav-link">
                     <span data-feather="file-text"></span>
                     Middelware
                   </router-link>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
+                  <router-link to="/artisan/make/migration" class="nav-link">
                     <span data-feather="file-text"></span>
                     Migration
-                  </a>
+                  </router-link>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#">
@@ -104,7 +104,7 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
               <h1 class="h2" v-text="title"></h1>
                           </div>
-            <router-view v-bind:config="config"></router-view>
+            <router-view v-bind:config="config" v-bind:result="result"></router-view>
           </main>
         </div>
       </div>
@@ -112,11 +112,14 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'App',
   created() {
     const self = this;
-    fetch('http://localhost/slimapp/artisan/models')
+    //'http://localhost/slimapp/artisan/models'
+    fetch('artisan/models')
       .then(response => response.json())
       .then((json) => {
         self.config.models = json;
@@ -125,6 +128,7 @@ export default {
   data() {
     return {
       title: 'Dashboard',
+      host: location.href,
       config: {
         slim: false,
         fill: true,
@@ -134,12 +138,20 @@ export default {
           csrf_value: document.getElementById('csrf_value').value,
         },
       },
+      result: {
+        info: [],
+        error: [],
+      }
     };
   },
   watch: {
     // whenever $route changes, this function will run
     $route(to) {
       this.title = to.name;
+      this.result = {
+        info: [],
+        error: [],
+      };
     },
   },
   methods: {
@@ -158,6 +170,25 @@ export default {
     },
     fixName(name) {
       return name.replace(/\s/g, '').replace(/\//g, '\\');
+    },
+    send(url, data) {
+      const self = this;
+      axios({
+        method: 'POST',
+        url: this.host + '/' + url,
+        data: Object.assign({}, this.config.csrf, data),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      })
+        .then(function (response) {
+          console.log(response);
+          self.result = response.data;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
   },
   mounted() {

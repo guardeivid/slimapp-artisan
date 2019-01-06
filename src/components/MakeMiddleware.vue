@@ -25,12 +25,9 @@
 </template>
 
 <script>
-  //<pre>{{ $data }}</pre>
-import axios from 'axios';
-
 export default {
   name: 'MakeMiddleware',
-  props: ['config'],
+  props: ['config', 'result'],
   data() {
     return {
       data: {
@@ -44,21 +41,7 @@ export default {
       if (!this.data.name) {
         return;
       }
-      axios({
-        method: 'POST',
-        url: 'http://localhost/slimapp/artisan/make/middleware',
-        data: Object.assign({}, this.config.csrf, this.data),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-      })
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      this.$parent.send('make/middleware', this.data);
     },
     nameMiddleware() {
       if (!this.data.name) {
@@ -73,13 +56,5 @@ export default {
 <style scoped>
   h1, h2, h4 {
     font-weight: normal;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  li {
-    display: inline-block;
-    margin: 0 10px;
   }
 </style>

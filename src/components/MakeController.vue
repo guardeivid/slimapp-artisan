@@ -43,7 +43,7 @@
           <label class="custom-control-label" for="force">Sobreescribir si ya existe la clase?</label>
         </div>
       </div>
-      <div class="col-md-6 mb-3">
+      <div class="col-md-6 mb-3 d-flex align-items-center">
         <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
       </div>
     </div>
@@ -53,12 +53,9 @@
 </template>
 
 <script>
-  //<pre>{{ $data }}</pre>
-import axios from 'axios';
-
 export default {
   name: 'MakeController',
-  props: ['config'],
+  props: ['config', 'result'],
   data() {
     return {
       data: {
@@ -66,7 +63,7 @@ export default {
         route: true,
         force: false,
         name: '',
-        model: "",
+        model: '',
       },
     };
   },
@@ -75,22 +72,7 @@ export default {
       if (!this.data.name) {
         return;
       }
-      axios({
-        method: 'POST',
-        url: 'http://localhost/slimapp/artisan/make/controller',
-        data: Object.assign({}, this.config.csrf, this.data),
-        headers: {
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-      })
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      this.$parent.send('make/controller', this.data);
     },
     nameController() {
       if (!this.data.name){
@@ -103,15 +85,7 @@ export default {
 </script>
 
 <style scoped>
-  h1, h2, h4 {
+  h4 {
     font-weight: normal;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  li {
-    display: inline-block;
-    margin: 0 10px;
   }
 </style>
