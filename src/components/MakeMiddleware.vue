@@ -20,14 +20,13 @@
       </div>
     </div>
     <hr>
-    <pre>{{ $data }}, {{ $props }}</pre>
   </div>
 </template>
 
 <script>
 export default {
   name: 'MakeMiddleware',
-  props: ['config', 'result'],
+  props: ['config'],
   data() {
     return {
       data: {

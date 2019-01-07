@@ -32,14 +32,13 @@
       </div>
     </div>
     <hr>
-    <pre>{{ $data }}, {{ $props }}</pre>
   </div>
 </template>
 
 <script>
 export default {
   name: 'MakeMigration',
-  props: ['config', 'result'],
+  props: ['config'],
   data() {
     return {
       data: {

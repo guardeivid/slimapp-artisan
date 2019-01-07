@@ -4,8 +4,6 @@
     <div class="row">
       <div class="col-md-6 mb-3">
         <h4 class="mb-3">Nombre de la clase del controlador</h4>
-        <label for="name">Nombre de la clase del controlador</label>
-        <input type="text" class="form-control" id="name" placeholder="NameController" required v-model="data.name" @blur="nameController" v-bind:class="{ 'border border-danger': !data.name }">
       </div>
       <div class="col-md-6 mb-3">
         <h4 class="mb-3">Seleccionar tipo de controlador</h4>
@@ -53,31 +51,19 @@
 
 <script>
 export default {
-  name: 'MakeController',
+  name: 'MigrateController',
   props: ['config'],
   data() {
     return {
       data: {
         type: 'resource',
-        route: true,
         force: false,
-        name: '',
-        model: '',
       },
     };
   },
   methods: {
     submit() {
-      if (!this.data.name) {
-        return;
-      }
-      this.$parent.send('make/controller', this.data);
-    },
-    nameController() {
-      if (!this.data.name){
-        return;
-      }
-      this.data.name = this.$parent.fillName(this.data.name, 'Controller');
+      this.$parent.send('migrate/migrate', this.data);
     },
   },
 };

@@ -16,7 +16,7 @@
             <div class="sidebar-sticky">
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <router-link to="artisan" class="nav-link">
+                  <router-link to="/artisan" class="nav-link">
                     <span data-feather="home"></span>
                     Dashboard
                   </router-link>
@@ -55,9 +55,6 @@
 
               <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Make</span>
-                <a class="d-flex align-items-center text-muted" href="#">
-                  <span data-feather="plus-circle"></span>
-                </a>
               </h6>
               <ul class="nav flex-column mb-2">
                 <li class="nav-item">
@@ -85,18 +82,59 @@
                   </router-link>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
+                  <router-link to="/artisan/make/seeder" class="nav-link">
                     <span data-feather="file-text"></span>
                     Seeder
-                  </a>
+                  </router-link>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
+                  <router-link to="/artisan/make/auth" class="nav-link">
                     <span data-feather="file-text"></span>
                     Auth
-                  </a>
+                  </router-link>
                 </li>
               </ul>
+
+              <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Migrate</span>
+              </h6>
+              <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                  <router-link to="/artisan/migrate/migrate" class="nav-link">
+                    <span data-feather="database"></span>
+                    Migrate
+                  </router-link>
+                  <router-link to="/artisan/migrate/rollback" class="nav-link">
+                    <span data-feather="database"></span>
+                    Rollback
+                  </router-link>
+                  <router-link to="/artisan/migrate/reset" class="nav-link">
+                    <span data-feather="database"></span>
+                    Reset
+                  </router-link>
+                  <router-link to="/artisan/migrate/refresh" class="nav-link">
+                    <span data-feather="database"></span>
+                    Refresh
+                  </router-link>
+                  <router-link to="/artisan/migrate/fresh" class="nav-link">
+                    <span data-feather="database"></span>
+                    Fresh
+                  </router-link>
+                </li>
+              </ul>
+
+              <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Seeder</span>
+              </h6>
+              <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                  <router-link to="/artisan/seed" class="nav-link">
+                    <span data-feather="database"></span>
+                    Seed
+                  </router-link>
+                </li>
+              </ul>
+
             </div>
           </nav>
 
@@ -105,6 +143,7 @@
               <h1 class="h2" v-text="title"></h1>
                           </div>
             <router-view v-bind:config="config" v-bind:result="result"></router-view>
+            <result-controller v-bind:result="result"></result-controller>
           </main>
         </div>
       </div>
@@ -113,9 +152,13 @@
 
 <script>
 import axios from 'axios';
+import ResultController from '@/components/ResultController';
 
 export default {
   name: 'App',
+  components: {
+    ResultController
+  },
   created() {
     const self = this;
     //'http://localhost/slimapp/artisan/models'

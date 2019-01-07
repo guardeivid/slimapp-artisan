@@ -19,7 +19,7 @@
         <h4 class="mb-3">Opciones</h4>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="all" v-model="data.all" @change="all">
-          <label class="custom-control-label" for="all">Generar una <em>migration</em>, <em>factory</em>, y <em>resource controller</em> para el modelo</label>
+          <label class="custom-control-label" for="all">Generar una <em>migration</em>, <em class="text-muted">factory</em>, y <em>resource controller</em> para el modelo</label>
         </div>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="controller" v-model="data.controller">
@@ -33,10 +33,11 @@
           <input type="checkbox" class="custom-control-input" id="migration" v-model="data.migration" @change="noall">
           <label class="custom-control-label" for="migration">Crear un archivo de <b>migration</b> para el modelo</label>
         </div>
-        <div class="custom-control custom-checkbox">
+        <!--<div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="factory" v-model="data.factory" @change="noall">
           <label class="custom-control-label" for="factory">Crear una nueva <b>factory</b> para el modelo</label>
         </div>
+        -->
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="pivot" v-model="data.pivot">
           <label class="custom-control-label" for="pivot">El modelo es una tabla intermedia <b>pivot</b>?</label>
@@ -44,14 +45,13 @@
       </div>
     </div>
     <hr>
-    <pre>{{ $data }}, {{ $props }}</pre>
   </div>
 </template>
 
 <script>
 export default {
   name: 'MakeModel',
-  props: ['config', 'result'],
+  props: ['config'],
   data() {
     return {
       data: {
@@ -89,7 +89,7 @@ export default {
     all() {
       if (this.data.all) {
         this.data.controller = true;
-        this.data.factory = true;
+        //this.data.factory = true; //no implementado
         this.data.migration = true;
         this.data.resource = true;
       }
