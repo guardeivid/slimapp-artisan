@@ -13,6 +13,9 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <div id="console" class="row" v-if="result.notes">
+        <div v-for="(note, index) in result.notes" :key="note" v-html="note" class="mb-1"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,3 +39,34 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  #console {
+    background-color: #151515;
+    color: white;
+    font-weight: bold;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    font-family: monospace;
+    white-space: normal;
+    font-size: 1.2em;
+  }
+
+  info {
+    color: #4CAF50;
+    display: contents;
+  }
+
+  comment {
+    color: #FFEB3B;
+    display: contents;
+  }
+
+  error {
+    color: red;
+    display: contents;
+  }
+</style>

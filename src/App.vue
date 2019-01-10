@@ -100,6 +100,10 @@
               </h6>
               <ul class="nav flex-column mb-2">
                 <li class="nav-item">
+                  <router-link to="/artisan/migrate/install" class="nav-link">
+                    <span data-feather="database"></span>
+                    Install
+                  </router-link>
                   <router-link to="/artisan/migrate/migrate" class="nav-link">
                     <span data-feather="database"></span>
                     Migrate
@@ -128,7 +132,7 @@
               </h6>
               <ul class="nav flex-column mb-2">
                 <li class="nav-item">
-                  <router-link to="/artisan/seed" class="nav-link">
+                  <router-link to="/artisan/db/seed" class="nav-link">
                     <span data-feather="database"></span>
                     Seed
                   </router-link>
@@ -161,11 +165,17 @@ export default {
   },
   created() {
     const self = this;
-    //'http://localhost/slimapp/artisan/models'
+
     fetch('artisan/models')
       .then(response => response.json())
       .then((json) => {
         self.config.models = json;
+      });
+
+    fetch('artisan/seeds')
+      .then(response => response.json())
+      .then((json) => {
+        self.config.seeds = json;
       });
   },
   data() {
@@ -176,6 +186,7 @@ export default {
         slim: false,
         fill: true,
         models: [],
+        seeds: [],
         csrf: {
           csrf_name: document.getElementById('csrf_name').value,
           csrf_value: document.getElementById('csrf_value').value,
@@ -184,6 +195,7 @@ export default {
       result: {
         info: [],
         error: [],
+        notes: [],
       }
     };
   },
@@ -194,6 +206,7 @@ export default {
       this.result = {
         info: [],
         error: [],
+        notes: [],
       };
     },
   },
