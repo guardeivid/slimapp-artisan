@@ -95,13 +95,14 @@ export default {
       }
     },
     noall() {
-      if (this.data.resource == false || this.data.factory == false || this.data.migration == false) {
+      if (this.data.resource === false || this.data.migration === false) {
+        // || this.data.factory === false
         this.data.all = false;
       } else {
         this.data.all = true;
         this.data.controller = true;
       }
-    }
+    },
   },
 };
 </script>

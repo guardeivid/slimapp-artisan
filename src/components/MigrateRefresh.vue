@@ -49,23 +49,23 @@
 
 <script>
 export default {
-  name: 'MigrateController',
+  name: 'MigrateRefresh',
   props: ['config'],
   data() {
     return {
       data: {
         database: 'default',
-        pretend : false,
-        seed    : false,
-        step    : false,
-        clase   : '',
-        force   : false,
+        pretend: false,
+        seed: false,
+        step: false,
+        clase: '',
+        force: false,
       },
     };
   },
   methods: {
     submit() {
-      this.$parent.send('migrate/migrate', this.data);
+      this.$parent.send('migrate/refresh', this.data);
     },
   },
 };

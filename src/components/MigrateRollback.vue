@@ -4,8 +4,8 @@
     <div class="row">
       <div class="col-md-6 mb-3">
         <div class="custom-control custom-radio">
-          <input id="database" name="database" type="text" class="form-control" v-model="data.database">
           <label for="database">Nombre de la conexión a la base de datos</label>
+          <input id="database" name="database" type="text" class="form-control" v-model="data.database">
         </div>
       </div>
       <div class="col-md-6 mb-3">
@@ -24,7 +24,7 @@
           <label class="custom-control-label" for="force">Ejecutar en producción?</label>
         </div>
       </div>
-      <div class="col-md-6 mb-3 d-flex align-items-center">
+      <div class="col-md mb-3 d-flex justify-content-center">
         <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
       </div>
     </div>
@@ -34,15 +34,15 @@
 
 <script>
 export default {
-  name: 'MigrateRollbackController',
+  name: 'MigrateRollback',
   props: ['config'],
   data() {
     return {
       data: {
         database: 'default',
-        pretend : false,
-        step    : 0,
-        force   : false,
+        pretend: false,
+        step: 0,
+        force: false,
       },
     };
   },

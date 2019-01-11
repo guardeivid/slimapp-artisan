@@ -12,11 +12,11 @@
       </div>
     </div>
     <hr>
-    <pre>{{ $data }}, {{ $props }}</pre>
   </div>
 </template>
 
 <script>
+//<pre>{{ $data }}, {{ $props }}</pre>
 export default {
   name: 'MakeSeeder',
   props: ['config'],

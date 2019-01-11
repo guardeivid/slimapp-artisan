@@ -13,8 +13,8 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div id="console" class="row" v-if="result.notes">
-        <div v-for="(note, index) in result.notes" :key="note" v-html="note" class="mb-1"></div>
+      <div id="console" class="row" v-if="result.notes.length">
+        <div v-for="note in result.notes" :key="note" v-html="note" class="mb-1"></div>
       </div>
     </div>
   </div>
@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: 'ResultController',
+  name: 'Resul',
   props: ['result'],
   methods: {
     close(el) {
@@ -31,7 +31,7 @@ export default {
         if (node.localName == 'div') {
           node.style.opacity = '0';
           node.style.transition = 'height 350ms ease-in-out, opacity 750ms ease-in-out';
-          setTimeout(function(){ node.style.display = 'none' }, 750);
+          setTimeout(function(){ node.style.display = 'none';}, 750);
           break;
         }
       }

@@ -5,13 +5,14 @@ import MakeMiddleware from '@/components/MakeMiddleware';
 import MakeMigration from '@/components/MakeMigration';
 import MakeModel from '@/components/MakeModel';
 import MakeSeeder from '@/components/MakeSeeder';
-import MigrateController from '@/components/MigrateController';
-import MigrateInstallController from '@/components/MigrateInstallController';
-import MigrateRollbackController from '@/components/MigrateRollbackController';
-import MigrateResetController from '@/components/MigrateResetController';
-import MigrateRefreshController from '@/components/MigrateRefreshController';
-import MigrateFreshController from '@/components/MigrateFreshController';
-import DbSeedController from '@/components/DbSeedController';
+import MakeValidation from '@/components/MakeValidation';
+import Migrate from '@/components/Migrate';
+import MigrateInstall from '@/components/MigrateInstall';
+import MigrateRollback from '@/components/MigrateRollback';
+import MigrateReset from '@/components/MigrateReset';
+import MigrateRefresh from '@/components/MigrateRefresh';
+import MigrateFresh from '@/components/MigrateFresh';
+import DbSeed from '@/components/DbSeed';
 
 Vue.use(Router);
 
@@ -27,13 +28,13 @@ export default new Router({
     { path: '/artisan/make/migration', component: MakeMigration, name: 'Create a new migration file' },
     { path: '/artisan/make/model', component: MakeModel, name: 'Create a new Eloquent model class' },
     { path: '/artisan/make/seeder', component: MakeSeeder, name: 'Create a new seeder class' },
-    { path: '/artisan/migrate/install', component: MigrateInstallController, name: 'Create the migration repository' },
-    { path: '/artisan/migrate/migrate', component: MigrateController, name: 'Run all outstanding migrations' },
-
-    { path: '/artisan/migrate/rollback', component: MigrateRollbackController, name: 'Rollback the last database migration' },
-    { path: '/artisan/migrate/reset', component: MigrateResetController, name: 'Rollback all database migrations' },
-    { path: '/artisan/migrate/refresh', component: MigrateRefreshController, name: 'Rollback all database migrations' },
-    { path: '/artisan/migrate/fresh', component: MigrateFreshController, name: 'Rollback all database migrations' },
-    { path: '/artisan/db/seed', component: DbSeedController, name: 'Rollback all database migrations' },
+    { path: '/artisan/make/validation', component: MakeValidation, name: 'Create a new validation rule and exception class' },
+    { path: '/artisan/migrate/install', component: MigrateInstall, name: 'Create the migration repository' },
+    { path: '/artisan/migrate/migrate', component: Migrate, name: 'Run all outstanding migrations' },
+    { path: '/artisan/migrate/rollback', component: MigrateRollback, name: 'Rollback the last database migration' },
+    { path: '/artisan/migrate/reset', component: MigrateReset, name: 'Rollback all database migrations' },
+    { path: '/artisan/migrate/refresh', component: MigrateRefresh, name: 'Reset and re-run all migrations' },
+    { path: '/artisan/migrate/fresh', component: MigrateFresh, name: 'Drop all tables and re-run all migrations' },
+    { path: '/artisan/db/seed', component: DbSeed, name: 'Seed the database with records' },
   ],
 });

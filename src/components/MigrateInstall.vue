@@ -4,8 +4,8 @@
     <div class="row">
       <div class="col-md-6 mb-3">
         <div class="custom-control custom-radio">
-          <input id="database" name="database" type="text" class="form-control" v-model="data.database">
           <label for="database">Nombre de la conexión a la base de datos</label>
+          <input id="database" name="database" type="text" class="form-control" v-model="data.database" @change="command">
         </div>
       </div>
       <div class="col-md-6 mb-3 d-flex align-items-center">
@@ -18,7 +18,7 @@
 
 <script>
 export default {
-  name: 'MigrateInstallController',
+  name: 'MigrateInstall',
   props: ['config'],
   data() {
     return {
@@ -28,7 +28,17 @@ export default {
     };
   },
   methods: {
+    command() {
+      let cmd = '>php artisan migrate:install';
+
+      if (this.data.database && this.data.database != 'default') {
+        cmd += ' --database=' + this.data.database;
+      }
+
+      this.$parent.addCommand(cmd);
+    },
     submit() {
+      this.command();
       this.$parent.send('migrate/install', this.data);
     },
   },
