@@ -12,8 +12,6 @@
           <label class="custom-control-label" for="force">Sobreescribir si ya existe la clase?</label>
         </div>
       </div>
-      <div class="col-md-6 mb-3">
-      </div>
       <div class="col-md-6 mb-3 d-flex align-items-center">
         <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
       </div>

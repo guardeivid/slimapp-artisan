@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     command() {
-      let cmd = '>php artisan migrate:install';
+      let cmd = '> php artisan migrate:install';
 
       if (this.data.database && this.data.database != 'default') {
         cmd += ' --database=' + this.data.database;

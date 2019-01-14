@@ -5,14 +5,11 @@
       <div class="col-md-6 mb-3">
         <h4 class="mb-3">Nombre del modelo</h4>
         <label for="name">Nombre del modelo</label>
-        <input type="text" class="form-control" id="name" placeholder="Model" required v-model="data.name" @blur="nameModel" v-bind:class="{ 'border border-danger': !data.name }">
+        <input type="text" class="form-control" id="name" placeholder="Model" required v-model="data.name" @blur="nameModel" v-bind:class="{ 'border border-danger': !data.name }" />
         <br>
         <div class="custom-control custom-checkbox mb-3">
           <input type="checkbox" class="custom-control-input" id="force" v-model="data.force">
           <label class="custom-control-label" for="force">Sobreescribir si ya existe la clase?</label>
-        </div>
-        <div class="d-flex justify-content-center">
-          <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
         </div>
       </div>
       <div class="col-md-6 mb-3">
@@ -42,6 +39,11 @@
           <input type="checkbox" class="custom-control-input" id="pivot" v-model="data.pivot">
           <label class="custom-control-label" for="pivot">El modelo es una tabla intermedia <b>pivot</b>?</label>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md mb-3 d-flex justify-content-center">
+        <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
       </div>
     </div>
     <hr>

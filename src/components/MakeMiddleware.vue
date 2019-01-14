@@ -6,16 +6,13 @@
         <h4 class="mb-3">Nombre de la clase del middleware</h4>
         <label for="name">Nombre de la clase del middleware</label>
         <input type="text" class="form-control" id="name" placeholder="NameMiddleware" required v-model="data.name" @blur="nameMiddleware" v-bind:class="{ 'border border-danger': !data.name }">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6 mb-3">
+        <br>
         <div class="custom-control custom-checkbox mb-3">
           <input type="checkbox" class="custom-control-input" id="force" v-model="data.force">
           <label class="custom-control-label" for="force">Sobreescribir si ya existe la clase?</label>
         </div>
       </div>
-      <div class="col-md-6 mb-3">
+      <div class="col-md-6 mb-3 d-flex align-items-center">
         <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
       </div>
     </div>

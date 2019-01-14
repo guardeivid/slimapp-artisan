@@ -72,6 +72,18 @@
               </ul>
 
               <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Route</span>
+              </h6>
+              <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                  <router-link to="/artisan/route/list" class="nav-link">
+                    <span data-feather="link"></span>
+                    List
+                  </router-link>
+                </li>
+              </ul>
+
+              <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Migrate</span>
               </h6>
               <ul class="nav flex-column mb-2">
@@ -114,7 +126,6 @@
                   </router-link>
                 </li>
               </ul>
-
             </div>
           </nav>
 
@@ -161,6 +172,7 @@ export default {
       config: {
         slim: false,
         fill: true,
+        console: true,
         models: [],
         seeds: [],
         csrf: {
@@ -215,8 +227,9 @@ export default {
         },
       })
         .then(function (response) {
-          if (response.data.notes) {
-            self.result.notes = [...self.result.notes, '', ...response.data.notes];
+          if (response.data.note) {
+            let cmd = self.result.notes[0];
+            self.result.notes = [cmd, '&nbsp;', ...response.data.note];
           } else {
             self.result = response.data;
           }
@@ -227,6 +240,9 @@ export default {
     },
     addCommand(cmd) {
       this.result.notes = [cmd];
+    },
+    setConfig(key, val) {
+      this.config[key] = val;
     },
   },
   mounted() {

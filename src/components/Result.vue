@@ -14,7 +14,7 @@
         </button>
       </div>
       <div id="console" class="row" v-if="result.notes.length">
-        <div v-for="note in result.notes" :key="note" v-html="note" class="mb-1"></div>
+        <div v-for="note in result.notes" :key="note" v-html="note" class="col-12 mb-1"></div>
       </div>
     </div>
   </div>
@@ -44,7 +44,7 @@ export default {
   #console {
     background-color: #151515;
     color: white;
-    font-weight: bold;
+    /*font-weight: bold;*/
     box-sizing: border-box;
     margin: 0 auto;
     padding: 10px;

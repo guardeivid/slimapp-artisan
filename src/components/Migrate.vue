@@ -68,7 +68,7 @@ export default {
   },
   methods: {
     command() {
-      let cmd = '>php artisan migrate';
+      let cmd = '> php artisan migrate';
 
       if (this.data.pretend) {
         cmd += ' --pretend';
