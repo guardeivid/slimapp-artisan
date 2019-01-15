@@ -71,7 +71,9 @@ export default {
     },
     submit() {
       this.command();
-      this.$parent.send('migrate/rollback', this.data);
+      //'migrate/rollback'
+      const url = 'http://localhost/slimapp/artisan/migrate/rollback';
+      this.$parent.send(url, this.data);
     },
   },
 };

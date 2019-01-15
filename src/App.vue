@@ -152,14 +152,17 @@ export default {
   },
   created() {
     const self = this;
-
-    fetch('artisan/models')
+    //'artisan/models'
+    let url = 'http://localhost/slimapp/artisan/models';
+    fetch(url)
       .then(response => response.json())
       .then((json) => {
         self.config.models = json;
       });
 
-    fetch('artisan/seeds')
+    //'artisan/seeds'
+    let url2 = 'http://localhost/slimapp/artisan/seeds';
+    fetch(url2)
       .then(response => response.json())
       .then((json) => {
         self.config.seeds = json;
@@ -168,7 +171,7 @@ export default {
   data() {
     return {
       title: 'Dashboard',
-      host: location.href,
+      host: 'http://localhost/slimapp/artisan', //location.href,
       config: {
         slim: false,
         fill: true,
@@ -220,6 +223,7 @@ export default {
       axios({
         method: 'POST',
         url: this.host + '/' + url,
+        //url: url,
         data: Object.assign({}, this.config.csrf, data),
         headers: {
           'Content-Type': 'application/json',

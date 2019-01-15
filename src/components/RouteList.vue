@@ -88,7 +88,9 @@ export default {
     },
     submit() {
       this.command();
-      this.$parent.send('route/list', {});
+      //'route/list'
+      const url = 'http://localhost/slimapp/artisan/route/list';
+      this.$parent.send('route/list', this.data);
     },
   },
 };
