@@ -8,7 +8,7 @@
         <input type="text" class="form-control" id="name" placeholder="NameMiddleware" required v-model="data.name" @blur="nameMiddleware" v-bind:class="{ 'border border-danger': !data.name }">
         <br>
         <div class="custom-control custom-checkbox mb-3">
-          <input type="checkbox" class="custom-control-input" id="force" v-model="data.force">
+          <input type="checkbox" class="custom-control-input" id="force" v-model="data.force" @change="command">
           <label class="custom-control-label" for="force">Sobreescribir si ya existe la clase?</label>
         </div>
       </div>
@@ -33,10 +33,25 @@ export default {
     };
   },
   methods: {
+    command() {
+      let cmd = '> php artisan make:middleware ';
+
+      if (this.data.name) {
+        cmd += this.data.name;
+
+        if (this.data.force) {
+          cmd += ' --force';
+        }
+
+      }
+
+      this.$parent.addCommand(cmd);
+    },
     submit() {
       if (!this.data.name) {
         return;
       }
+      this.command();
       this.$parent.send('make/middleware', this.data);
     },
     nameMiddleware() {
@@ -44,6 +59,7 @@ export default {
         return;
       }
       this.data.name = this.$parent.fillName(this.data.name, 'Middleware');
+      this.command();
     },
   },
 };

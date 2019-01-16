@@ -2,7 +2,7 @@
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
-      <div class="col-md-6 mb-3">
+      <div class="col-md mb-3">
         <h4 class="mb-3">Opciones</h4>
         <div class="custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="slim" v-model="slim">

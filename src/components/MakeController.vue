@@ -10,15 +10,15 @@
       <div class="col-md-6 mb-3">
         <h4 class="mb-3">Seleccionar tipo de controlador</h4>
         <div class="custom-control custom-radio">
-          <input id="resource" name="type" type="radio" class="custom-control-input" required v-model="data.type" value="resource">
+          <input id="resource" name="type" type="radio" class="custom-control-input" required v-model="data.type" value="resource" @change="command">
           <label class="custom-control-label" for="resource">Resource</label>
         </div>
         <div class="custom-control custom-radio">
-          <input id="credit" name="type" type="radio" class="custom-control-input" checked required v-model="data.type" value="plain">
+          <input id="credit" name="type" type="radio" class="custom-control-input" checked required v-model="data.type" value="plain" @change="command">
           <label class="custom-control-label" for="credit">Plain</label>
         </div>
         <div class="custom-control custom-radio">
-          <input id="invokable" name="type" type="radio" class="custom-control-input" required v-model="data.type" value="invokable">
+          <input id="invokable" name="type" type="radio" class="custom-control-input" required v-model="data.type" value="invokable" @change="command">
           <label class="custom-control-label" for="invokable">Invokable</label>
         </div>
       </div>
@@ -32,14 +32,14 @@
         </div>
         <div v-if="data.type === 'resource'">
           <label for="model">Nombre del modelo (opcional)</label>
-          <select type="text" class="form-control" id="model" placeholder="Model" required v-model="data.model">
+          <select type="text" class="form-control" id="model" placeholder="Model" required v-model="data.model" @change="command">
             <option></option>
             <option v-for="option in config.models" :key="option" v-bind:value="option">{{ option }}</option>
           </select>
         </div>
         <br>
         <div class="custom-control custom-checkbox mb-3">
-          <input type="checkbox" class="custom-control-input" id="force" v-model="data.force">
+          <input type="checkbox" class="custom-control-input" id="force" v-model="data.force" @change="command">
           <label class="custom-control-label" for="force">Sobreescribir si ya existe la clase?</label>
         </div>
       </div>
@@ -67,10 +67,29 @@ export default {
     };
   },
   methods: {
+    command() {
+      let cmd = '> php artisan make:controller ';
+
+      if (this.data.name) {
+        cmd += this.data.name;
+
+        if (this.data.type) {
+          cmd += ' --' + this.data.type;
+        }
+        
+        if (this.data.model) {
+          cmd += ' --model=' + this.data.model;
+        }
+
+      }
+
+      this.$parent.addCommand(cmd);
+    },
     submit() {
       if (!this.data.name) {
         return;
       }
+      this.command();
       this.$parent.send('make/controller', this.data);
     },
     nameController() {
@@ -78,6 +97,7 @@ export default {
         return;
       }
       this.data.name = this.$parent.fillName(this.data.name, 'Controller');
+      this.command();
     },
   },
 };

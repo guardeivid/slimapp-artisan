@@ -154,7 +154,7 @@ export default {
     const self = this;
     //'artisan/models'
     let url = 'http://localhost/slimapp/artisan/models';
-    fetch(url)
+    fetch(`${this.host}/models`)
       .then(response => response.json())
       .then((json) => {
         self.config.models = json;
@@ -162,7 +162,7 @@ export default {
 
     //'artisan/seeds'
     let url2 = 'http://localhost/slimapp/artisan/seeds';
-    fetch(url2)
+    fetch(`${this.host}/seeds`)
       .then(response => response.json())
       .then((json) => {
         self.config.seeds = json;
@@ -231,11 +231,13 @@ export default {
         },
       })
         .then(function (response) {
+          let cmd = self.result.notes[0];
           if (response.data.note) {
-            let cmd = self.result.notes[0];
             self.result.notes = [cmd, '&nbsp;', ...response.data.note];
           } else {
-            self.result = response.data;
+            self.result.info = response.data.info || [];
+            self.result.error = response.data.error || [];
+            self.result.notes = [cmd, '&nbsp;', ...response.data.note] || [cmd, '&nbsp;'];
           }
         })
         .catch(function (error) {

@@ -8,7 +8,7 @@
         <input type="text" class="form-control" id="name" placeholder="Model" required v-model="data.name" @blur="nameModel" v-bind:class="{ 'border border-danger': !data.name }" />
         <br>
         <div class="custom-control custom-checkbox mb-3">
-          <input type="checkbox" class="custom-control-input" id="force" v-model="data.force">
+          <input type="checkbox" class="custom-control-input" id="force" v-model="data.force" @change="command">
           <label class="custom-control-label" for="force">Sobreescribir si ya existe la clase?</label>
         </div>
       </div>
@@ -19,7 +19,7 @@
           <label class="custom-control-label" for="all">Generar una <em>migration</em>, <em class="text-muted">factory</em>, y <em>resource controller</em> para el modelo</label>
         </div>
         <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="controller" v-model="data.controller">
+          <input type="checkbox" class="custom-control-input" id="controller" v-model="data.controller" @change="command">
           <label class="custom-control-label" for="controller">Crear un nuevo <b>controller</b> para el modelo</label>
         </div>
         <div class="custom-control custom-checkbox">
@@ -36,7 +36,7 @@
         </div>
         -->
         <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="pivot" v-model="data.pivot">
+          <input type="checkbox" class="custom-control-input" id="pivot" v-model="data.pivot" @change="command">
           <label class="custom-control-label" for="pivot">El modelo es una tabla intermedia <b>pivot</b>?</label>
         </div>
       </div>
@@ -76,10 +76,45 @@ export default {
     };
   },
   methods: {
+    command() {
+      let cmd = '> php artisan make:model ';
+
+      if (this.data.name) {
+        cmd += this.data.name;
+
+        if (this.data.all) {
+          cmd += ' --all';
+        } else {
+          if (this.data.migration) {
+            cmd += ' --migration';
+          }
+
+          if (this.data.controller) {
+            cmd += ' --controller';
+          }
+
+          if (this.data.resource) {
+            cmd += ' --resource';
+          }
+        }
+
+        if (this.data.pivot) {
+          cmd += ' --pivot';
+        }
+
+        if (this.data.force) {
+          cmd += ' --force';
+        }
+
+      }
+
+      this.$parent.addCommand(cmd);
+    },
     submit() {
       if (!this.data.name) {
         return;
       }
+      this.command();
       this.$parent.send('make/model', this.data);
     },
     nameModel() {
@@ -87,6 +122,7 @@ export default {
         return;
       }
       this.data.name = this.$parent.fillName(this.data.name, '');
+      this.command();
     },
     all() {
       if (this.data.all) {
@@ -95,6 +131,7 @@ export default {
         this.data.migration = true;
         this.data.resource = true;
       }
+      this.command();
     },
     noall() {
       if (this.data.resource === false || this.data.migration === false) {
@@ -104,6 +141,7 @@ export default {
         this.data.all = true;
         this.data.controller = true;
       }
+      this.command();
     },
   },
 };
