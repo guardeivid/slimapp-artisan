@@ -152,16 +152,14 @@ export default {
   },
   created() {
     const self = this;
-    //'artisan/models'
-    let url = 'http://localhost/slimapp/artisan/models';
+    //this.host = this.trim(location.href, "/");
+
     fetch(`${this.host}/models`)
       .then(response => response.json())
       .then((json) => {
         self.config.models = json;
       });
 
-    //'artisan/seeds'
-    let url2 = 'http://localhost/slimapp/artisan/seeds';
     fetch(`${this.host}/seeds`)
       .then(response => response.json())
       .then((json) => {
@@ -202,6 +200,13 @@ export default {
     },
   },
   methods: {
+    trim (string, char) {
+      if (char === "]") char = "\\]";
+      if (char === "\\") char = "\\\\";
+      return string.replace(new RegExp(
+        "^[" + char + "]+|[" + char + "]+$", "g"
+      ), "");
+    },
     fillName(name, fill) {
       let fillname = this.fixName(name);
       if (this.config.fill) {
@@ -232,12 +237,26 @@ export default {
       })
         .then(function (response) {
           let cmd = self.result.notes[0];
-          if (response.data.note) {
-            self.result.notes = [cmd, '&nbsp;', ...response.data.note];
+          if (response.data.notes) {
+            self.result.notes = [cmd, '&nbsp;', ...response.data.notes];
           } else {
-            self.result.info = response.data.info || [];
-            self.result.error = response.data.error || [];
-            self.result.notes = [cmd, '&nbsp;', ...response.data.note] || [cmd, '&nbsp;'];
+            if (self.config.console) {
+              let info = response.data.info || [];
+              info = info.map(function(e){
+                return `<info>${e}</info>`;                
+              });
+
+              let error = response.data.error || [];
+              error = error.map(function(e){
+                return `<critical>${e}</critical>`;
+              });
+
+              self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes, ...info, ...error] : [cmd, '&nbsp;', ...info, ...error];
+            } else {
+              self.result.info = response.data.info || [];
+              self.result.error = response.data.error || [];
+              self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes, ...info, ...error] : [cmd, '&nbsp;', ...info, ...error];
+            }
           }
         })
         .catch(function (error) {

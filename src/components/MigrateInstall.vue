@@ -8,7 +8,7 @@
           <input id="database" name="database" type="text" class="form-control" v-model="data.database" @change="command">
         </div>
       </div>
-      <div class="col-md-6 mb-3 d-flex align-items-center">
+      <div class="col-md-6 mb-3 d-flex align-items-end">
         <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
       </div>
     </div>

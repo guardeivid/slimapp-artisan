@@ -88,8 +88,6 @@ export default {
     },
     submit() {
       this.command();
-      //'route/list'
-      const url = 'http://localhost/slimapp/artisan/route/list';
       this.$parent.send('route/list', this.data);
     },
   },

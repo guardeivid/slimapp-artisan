@@ -40,7 +40,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
   #console {
     background-color: #151515;
     color: white;
@@ -57,16 +57,28 @@ export default {
 
   info {
     color: #4CAF50;
+    font-weight: bold;
     display: contents;
   }
 
   comment {
     color: #FFEB3B;
+    font-weight: bold;
     display: contents;
+    padding: 2px;
   }
 
   error {
     color: red;
     display: contents;
+    padding: 2px;
+    font-weight: bold;
+  }
+
+  critical {
+    background-color: red;
+    font-weight: bold;
+    padding: 2px;
+    /*display: contents;*/
   }
 </style>
