@@ -28,10 +28,20 @@ export default {
     };
   },
   methods: {
+    command() {
+      let cmd = '> php artisan make:seeder ';
+
+      if (this.data.name) {
+        cmd += this.data.name;
+      }
+
+      this.$parent.addCommand(cmd);
+    },
     submit() {
       if (!this.data.name) {
         return;
       }
+      this.command();
       this.$parent.send('make/seeder', this.data);
     },
     NameSeeder() {
@@ -39,6 +49,7 @@ export default {
         return;
       }
       this.data.name = this.$parent.fillName(this.data.name, 'TableSeeder');
+      this.command();
     },
   },
 };
