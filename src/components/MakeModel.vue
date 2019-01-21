@@ -13,7 +13,7 @@
         </div>
       </div>
       <div class="col-md-6 mb-3">
-        <h4 class="mb-3">Opciones</h4>
+        <h4 class="mb-3">Opciones de archivos</h4>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="all" v-model="data.all" @change="all">
           <label class="custom-control-label" for="all">Generar una <em>migration</em>, <em class="text-muted">factory</em>, y <em>resource controller</em> para el modelo</label>
@@ -38,6 +38,92 @@
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="pivot" v-model="data.pivot" @change="command">
           <label class="custom-control-label" for="pivot">El modelo es una tabla intermedia <b>pivot</b>?</label>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md mb-3">
+        <h4 class="mb-3">Opciones del Modelo</h4>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="plain" v-model="data.plain" @change="command">
+          <label class="custom-control-label" for="plain">Generar modelo plano / No customizable</label>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <div class="form-group">
+          <label for="table">Nombre de la tabla</label>
+          <input type="text" class="form-control" id="table" v-model="data.table" @change="command" />
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="form-group">
+          <label for="primarykey">Campo Clave Primaria (PK)</label>
+          <input type="text" class="form-control" id="table" v-model="data.primarykey" @change="command" />
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="form-group">
+          <label for="keytype">Tipo de campo de PK</label>
+          <select type="text" class="form-control" id="keytype" v-model="data.keytype" @change="command">
+            <option value="int">INTEGER</option>
+            <option value="string">STRING</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <br>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="incrementing" v-model="data.incrementing" @change="command">
+          <label class="custom-control-label" for="incrementing">Clave autoincremental</label>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <h5>Timestamps</h5>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="soft" v-model="data.soft" @change="command">
+          <label class="custom-control-label" for="soft">Usa soft deletes</label>
+        </div>
+        <br>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="timestamps" v-model="data.timestamps" @change="command">
+          <label class="custom-control-label" for="timestamps">Usa campos de tiempo</label>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="form-group">
+          <label for="created_at">Campo CREATED_AT</label>
+          <input type="text" class="form-control" id="created_at" v-model="data.created_at" @change="command" />
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="form-group">
+          <label for="updated_at">Campo UPDATED_AT</label>
+          <input type="text" class="form-control" id="updated_at" v-model="data.updated_at" @change="command" />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <h5>Asignación masiva</h5>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="autofill" v-model="data.autofill" @change="command">
+          <label class="custom-control-label" for="autofill">General automáticamente <em>fillable</em></label>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="form-group">
+          <label for="fillable">Lista blanca (<em>fillable</em>)</label>
+          <input type="text" class="form-control" id="fillable" v-model="data.fillable" @blur="cleanValueList(data.fillable, 'fillable')" />
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="form-group">
+          <label for="guarded">Lista negra (<em>guarded</em> '*' = todos)</label>
+          <input type="text" class="form-control" id="guarded" v-model="data.guarded" @blur="cleanValueList(data.guarded, 'guarded')" />
         </div>
       </div>
     </div>
@@ -72,6 +158,19 @@ export default {
         resource: false,
         //Create the class even if the model already exists
         force: false,
+        //Options Model
+        plain: true,
+        soft: false,
+        table: '',
+        primarykey: 'id',
+        incrementing: true,
+        keytype: 'int',
+        timestamps: true,
+        created_at: 'created_at',
+        updated_at:'updated_at',
+        autofill: false,
+        fillable: '',
+        guarded: '*',
       },
     };
   },
@@ -106,6 +205,52 @@ export default {
           cmd += ' --force';
         }
 
+        if (!this.data.plain) {
+          if (this.data.table) {
+            cmd += ' --table=' + this.data.table;
+          }
+
+          if (this.data.primarykey != 'id') {
+            cmd += ' --pk=' + this.data.primarykey;
+          }
+
+          if (!this.data.incrementing) {
+            cmd += ' --no-incrementing';
+          }
+
+          if (this.data.keytype != 'int') {
+            cmd += ' --keytype=' + this.data.keytype;
+          }
+
+          if (!this.data.timestamps) {
+            cmd += ' --no-timestamps';
+          } else {
+            if (this.data.created_at != 'created_at') {
+              cmd += ' --created_at=' + this.data.created_at;
+            }
+
+            if (this.data.updated_at != 'updated_at') {
+              cmd += ' --updated_at=' + this.data.updated_at;
+            }
+          }
+
+          if (this.data.soft) {
+            cmd += ' --soft';
+          }
+
+          if (this.data.autofill) {
+            cmd += ' --autofill';
+          } else {
+            if (this.data.fillable) {
+              cmd += ' --fillable=' + this.data.fillable;
+            } else {
+              if (this.data.guarded != '*') {
+                cmd += ' --guarded=' + this.data.guarded;
+              }
+            }
+          }
+
+        }
       }
 
       this.$parent.addCommand(cmd);
@@ -142,6 +287,28 @@ export default {
         this.data.controller = true;
       }
       this.command();
+    },
+    cleanValueList(value, list) {
+      if (list == 'fillable') {
+        if (value) {
+          value = this.cleanValue(value);
+        }
+        this.data.fillable = value;
+      } else if (list == 'guarded') {
+        if (value && value != '*') {
+          value = this.cleanValue(value);
+        }
+        this.data.guarded = value;
+      }
+      this.command();
+    },
+    cleanValue(value) {
+      value = value.toLowerCase().replace(/[\s]|'|"/g, '').replace(/-/g, '_');
+
+      if (!value) return value;
+
+      value = value.split(',').join("', '");
+      return "'" + value + "'";
     },
   },
 };
