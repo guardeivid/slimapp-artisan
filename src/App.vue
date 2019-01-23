@@ -28,15 +28,15 @@
               </h6>
               <ul class="nav flex-column mb-2">
                 <li class="nav-item">
-                  <router-link to="/artisan/make/controller" class="nav-link">
-                    <span data-feather="file-text"></span>
-                    Controller
-                  </router-link>
-                </li>
-                <li class="nav-item">
                   <router-link to="/artisan/make/model" class="nav-link">
                     <span data-feather="file-text"></span>
                     Model
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/artisan/make/controller" class="nav-link">
+                    <span data-feather="file-text"></span>
+                    Controller
                   </router-link>
                 </li>
                 <li class="nav-item">
@@ -243,7 +243,7 @@ export default {
             if (self.config.console) {
               let info = response.data.info || [];
               info = info.map(function(e){
-                return `<info>${e}</info>`;                
+                return `<info>${e}</info>`;
               });
 
               let error = response.data.error || [];

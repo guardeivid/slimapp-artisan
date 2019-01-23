@@ -42,45 +42,50 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md mb-3">
+      <div class="col-md-4 mb-3">
         <h4 class="mb-3">Opciones del Modelo</h4>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="plain" v-model="data.plain" @change="command">
           <label class="custom-control-label" for="plain">Generar modelo plano / No customizable</label>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-md-3 mb-3">
-        <div class="form-group">
+      <div class="col-md-8 mb-3">
+        <div class="form-group" v-if="!data.plain">
           <label for="table">Nombre de la tabla</label>
           <input type="text" class="form-control" id="table" v-model="data.table" @change="command" />
         </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="form-group">
-          <label for="primarykey">Campo Clave Primaria (PK)</label>
-          <input type="text" class="form-control" id="table" v-model="data.primarykey" @change="command" />
+    </div>
+    <div class="row" v-if="!data.plain">
+      <div class="col-md-4 mb-3">
+        <h5>Clave Primaria</h5>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="autopk" v-model="data.autopk" @change="command">
+          <label class="custom-control-label" for="autopk">Generar automáticamente <em>primarykey</em>, <em>keytype</em> y <em>incrementing</em></label>
+        </div>
+        <br>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="incrementing" v-model="data.incrementing" @change="command" :disabled="data.autopk">
+          <label class="custom-control-label" for="incrementing">Clave autoincremental</label>
         </div>
       </div>
-      <div class="col-md-3 mb-3">
+      <div class="col-md-4 mb-3">
+        <div class="form-group">
+          <label for="primarykey">Campo Clave Primaria (PK)</label>
+          <input type="text" class="form-control" id="table" v-model="data.primarykey" @change="command" :disabled="data.autopk" />
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
         <div class="form-group">
           <label for="keytype">Tipo de campo de PK</label>
-          <select type="text" class="form-control" id="keytype" v-model="data.keytype" @change="command">
+          <select type="text" class="form-control" id="keytype" v-model="data.keytype" @change="command" :disabled="data.autopk">
             <option value="int">INTEGER</option>
             <option value="string">STRING</option>
           </select>
         </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <br>
-        <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="incrementing" v-model="data.incrementing" @change="command">
-          <label class="custom-control-label" for="incrementing">Clave autoincremental</label>
-        </div>
-      </div>
     </div>
-    <div class="row">
+    <div class="row" v-if="!data.plain">
       <div class="col-md-4 mb-3">
         <h5>Timestamps</h5>
         <div class="custom-control custom-checkbox">
@@ -96,34 +101,34 @@
       <div class="col-md-4 mb-3">
         <div class="form-group">
           <label for="created_at">Campo CREATED_AT</label>
-          <input type="text" class="form-control" id="created_at" v-model="data.created_at" @change="command" />
+          <input type="text" class="form-control" id="created_at" v-model="data.created_at" @change="command" :disabled="!data.timestamps" />
         </div>
       </div>
       <div class="col-md-4 mb-3">
         <div class="form-group">
           <label for="updated_at">Campo UPDATED_AT</label>
-          <input type="text" class="form-control" id="updated_at" v-model="data.updated_at" @change="command" />
+          <input type="text" class="form-control" id="updated_at" v-model="data.updated_at" @change="command" :disabled="!data.timestamps" />
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row" v-if="!data.plain">
       <div class="col-md-4 mb-3">
         <h5>Asignación masiva</h5>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="autofill" v-model="data.autofill" @change="command">
-          <label class="custom-control-label" for="autofill">General automáticamente <em>fillable</em></label>
+          <label class="custom-control-label" for="autofill">Generar automáticamente <em>fillable</em></label>
         </div>
       </div>
       <div class="col-md-4 mb-3">
         <div class="form-group">
           <label for="fillable">Lista blanca (<em>fillable</em>)</label>
-          <input type="text" class="form-control" id="fillable" v-model="data.fillable" @blur="cleanValueList(data.fillable, 'fillable')" />
+          <input type="text" class="form-control" id="fillable" v-model="data.fillable" @blur="cleanValueList(data.fillable, 'fillable')" :disabled="data.autofill" />
         </div>
       </div>
       <div class="col-md-4 mb-3">
         <div class="form-group">
-          <label for="guarded">Lista negra (<em>guarded</em> '*' = todos)</label>
-          <input type="text" class="form-control" id="guarded" v-model="data.guarded" @blur="cleanValueList(data.guarded, 'guarded')" />
+          <label for="guarded">Lista negra (<em>guarded</em> * = todos)</label>
+          <input type="text" class="form-control" id="guarded" v-model="data.guarded" @blur="cleanValueList(data.guarded, 'guarded')" :disabled="data.autofill" />
         </div>
       </div>
     </div>
@@ -161,6 +166,7 @@ export default {
         //Options Model
         plain: true,
         soft: false,
+        autopk: false,
         table: '',
         primarykey: 'id',
         incrementing: true,
@@ -210,16 +216,20 @@ export default {
             cmd += ' --table=' + this.data.table;
           }
 
-          if (this.data.primarykey != 'id') {
-            cmd += ' --pk=' + this.data.primarykey;
-          }
+          if (this.data.autopk) {
+            cmd += ' --autopk';
+          } else {
+            if (this.data.primarykey != 'id') {
+              cmd += ' --pk=' + this.data.primarykey;
+            }
 
-          if (!this.data.incrementing) {
-            cmd += ' --no-incrementing';
-          }
+            if (!this.data.incrementing) {
+              cmd += ' --no-incrementing';
+            }
 
-          if (this.data.keytype != 'int') {
-            cmd += ' --keytype=' + this.data.keytype;
+            if (this.data.keytype != 'int') {
+              cmd += ' --keytype=' + this.data.keytype;
+            }
           }
 
           if (!this.data.timestamps) {
