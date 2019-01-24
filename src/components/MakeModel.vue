@@ -270,7 +270,7 @@ export default {
         return;
       }
       this.command();
-      this.$parent.send('make/model', this.data);
+      this.$parent.send('make/model', this.data, this.$parent.fetchModels);
     },
     nameModel() {
       if (!this.data.name) {

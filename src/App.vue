@@ -151,20 +151,8 @@ export default {
     Result
   },
   created() {
-    const self = this;
-    //this.host = this.trim(location.href, "/");
-
-    fetch(`${this.host}/models`)
-      .then(response => response.json())
-      .then((json) => {
-        self.config.models = json;
-      });
-
-    fetch(`${this.host}/seeds`)
-      .then(response => response.json())
-      .then((json) => {
-        self.config.seeds = json;
-      });
+    this.fetchModels();
+    this.fetchSeeds();
   },
   data() {
     return {
@@ -200,7 +188,23 @@ export default {
     },
   },
   methods: {
-    trim (string, char) {
+    fetchModels() {
+      const self = this;
+      fetch(`${this.host}/models`)
+        .then(response => response.json())
+        .then((json) => {
+          self.config.models = json;
+        });
+    },
+    fetchSeeds() {
+      const self = this;
+      fetch(`${this.host}/seeds`)
+        .then(response => response.json())
+        .then((json) => {
+          self.config.seeds = json;
+        });
+    },
+    trim(string, char) {
       if (char === "]") char = "\\]";
       if (char === "\\") char = "\\\\";
       return string.replace(new RegExp(
@@ -223,7 +227,7 @@ export default {
     fixName(name) {
       return name.replace(/\s/g, '').replace(/\//g, '\\');
     },
-    send(url, data) {
+    send(url, data, callback) {
       const self = this;
       axios({
         method: 'POST',
@@ -257,6 +261,10 @@ export default {
               self.result.error = response.data.error || [];
               self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes, ...info, ...error] : [cmd, '&nbsp;', ...info, ...error];
             }
+          }
+
+          if(callback) {
+            callback();
           }
         })
         .catch(function (error) {
