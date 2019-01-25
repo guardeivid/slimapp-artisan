@@ -21,12 +21,15 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6 mb-3">
+      <div class="col-md mb-3">
         <div class="mb-3">
             <label for="tablename">Nombre de la tabla</label>
             <input type="text" class="form-control" id="tablename" v-model="data.table" @change="command">
         </div>
       </div>
+      <design-table></design-table>
+    </div>
+    <div class="row">
       <div class="col-md-6 mb-3 d-flex align-items-center">
         <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
       </div>
@@ -36,8 +39,13 @@
 </template>
 
 <script>
+import DesignTable from '@/components/DesignTable';
+
 export default {
   name: 'MakeMigration',
+  components: {
+    DesignTable
+  },
   props: ['config'],
   data() {
     return {
@@ -45,6 +53,9 @@ export default {
         name: '',
         type: 'create',
         table: '',
+        custom: false,
+        schema: '',
+        design: [],
       },
     };
   },
@@ -54,6 +65,10 @@ export default {
 
       if (this.data.name) {
         cmd += `${this.data.name} --${this.data.type}=${this.data.table}`;
+
+        if (this.data.custom) {
+          cmd += ` --schema=${this.data.schema}`;
+        }
       }
 
       this.$parent.addCommand(cmd);
