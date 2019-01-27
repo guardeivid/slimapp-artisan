@@ -27,8 +27,8 @@
             <input type="text" class="form-control" id="tablename" v-model="data.table" @change="command">
         </div>
       </div>
-      <design-table></design-table>
     </div>
+    <design-table :fields="data.fields" :options.sync="options" @updateOtionsParent="updateOptions"></design-table>
     <div class="row">
       <div class="col-md-6 mb-3 d-flex align-items-center">
         <button class="btn btn-primary btn-lg" type="submit" v-on:click="submit">Ejecutar</button>
@@ -49,13 +49,23 @@ export default {
   props: ['config'],
   data() {
     return {
+      options: {
+        index: 0,
+        default: '',
+        comment: '',
+        unsigned: false,
+        autoincrement: false,
+      },
       data: {
         name: '',
         type: 'create',
         table: '',
         custom: false,
         schema: '',
-        design: [],
+        fields: [
+          {name: 'id', type: 'increments', total: 0, decimal: 0, notnull: true, pk: true, default: '', comment: ''},
+          {name: 'nombre', type: 'string', total: 0, decimal: 0, notnull: false, pk: false, default: '', comment: ''},
+        ],
       },
     };
   },
@@ -80,6 +90,11 @@ export default {
       this.command();
       this.$parent.send('make/migration', this.data);
     },
+    updateOptions() {
+      let field = this.data.fields[this.options.index];
+      field.default = this.options.default;
+      field.comment = this.options.comment;
+    }
   },
 };
 </script>

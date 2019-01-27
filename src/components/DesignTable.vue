@@ -1,65 +1,99 @@
 <template>
   <div class="row">
-    <div class="col-md mb-3">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Type</th>
-            <th>Length</th>
-            <th>Decimals</th>
-            <th>Not Null</th>
-            <th>Primary Key</th>
-            <th>Default</th>
-            <th>Comment</th>
-          </tr>
-        </thead>
-        <tbody v-if="table.length">
-          <tr v-for="row in table" :key="row">
-            <td>
-              <input type="text" class="form-control" required v-model="row.field" v-bind:class="{ 'border border-danger': !row.field }" @change="command">
-            </td>
-            <td>
-              <select class="form-control" required v-model="row.type" @change="command">
-                <option></option>
-                <option v-for="type in types" :key="type" v-bind:value="type">{{ type }}</option>
-              </select>
-            </td>
-            <td>
-              <input type="number" class="form-control" v-model="row.total" min="0" @change="command">
-            </td>
-            <td>
-              <input type="number" class="form-control" v-model="row.decimals" min="0" @change="command">
-            </td>
-            <td>
-              <div class="custom-control custom-checkbox mb-3">
-                <input type="checkbox" class="custom-control-input" v-model="row.notnull" @change="command">
+    <div class="tabs">
+      <div class="tabs">
+        <a @click="tab=1" :class="{'active': tab === 1 }">Fields</a>
+        <a @click="tab=2" :class="{'active': tab === 2 }">Indexes</a>
+        <a @click="tab=3" :class="{'active': tab === 3 }">Foreign Keys</a>
+      </div>
+      <div class="content">
+        <div class="col-md mb-3 tabcontent" v-if="tab == 1">
+          <div class="table-responsive ">
+            <table class="table table-sm table-borderless">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Length</th>
+                  <th>Decimals</th>
+                  <th>Not Null</th>
+                  <th>Primary Key</th>
+                  <th></th>
+                  <!--<th>Comment</th>-->
+                </tr>
+              </thead>
+              <tbody v-if="fields.length">
+                <tr v-for="(field, index) in fields" :key="index" @click="focusField(field, index)">
+                  <td>
+                    <input type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="command">
+                  </td>
+                  <td>
+                    <select class="form-control form-control-sm material" required v-model="field.type" @change="command">
+                      <option></option>
+                      <option v-for="type in types" :key="type" v-bind:value="type">{{ type }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm material" v-model="field.total" min="0" @change="command">
+                  </td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm material" v-model="field.decimal" min="0" @change="command">
+                  </td>
+                  <td>
+                    <div class="custom-control custom-checkbox mb-3 ml-2">
+                      <input type="checkbox" class="custom-control-input" v-model="field.notnull" @change="command" :id="`notnull_${index}`">
+                      <label class="custom-control-label" :for="`notnull_${index}`"> </label>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="custom-control custom-checkbox mb-3 ml-2">
+                      <input type="checkbox" class="custom-control-input" v-model="field.pk" @change="command" :id="`pk_${index}`">
+                      <label class="custom-control-label" :for="`pk_${index}`"> </label>
+                    </div>
+                  </td>
+                  <!--<td>
+                    <input type="text" class="form-control form-control-sm" v-model="field.default" @change="command">
+                  </td>
+                  <td>
+                    <input type="text" class="form-control form-control-sm" v-model="field.comment" @change="command">
+                  </td>-->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="form-group row">
+              <label for="inputdefault" class="col-sm-2 col-form-label">Default</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control form-control-sm" id="inputdefault" v-model="options.default" @change="updateOptions">
               </div>
-            </td>
-            <td>
-              <div class="custom-control custom-checkbox mb-3">
-                <input type="checkbox" class="custom-control-input" v-model="row.pk" @change="command">
+            </div>
+            <div class="form-group row">
+              <label for="inputcomment" class="col-sm-2 col-form-label">Comment</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control form-control-sm" id="inputcomment" v-model="options.comment" @change="updateOptions">
               </div>
-            </td>
-            <td>
-              <input type="text" class="form-control" required v-model="row.default" @change="command">
-            </td>
-            <td>
-              <input type="text" class="form-control" required v-model="row.comment" @change="command">
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md mb-3 table-responsive tabcontent" v-if="tab == 2">
+          Indexes
+        </div>
+        <div class="col-md mb-3 table-responsive tabcontent" v-if="tab == 3">
+          Foreign Keys
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'DesignTable',
+  props: ['fields', 'options'],
   data() {
     return {
-      table: [],
       types: [
         'bigIncrements',  //  Auto-incrementing UNSIGNED BIGINT (primary key)
         'bigInteger', //BIGINT
@@ -119,13 +153,101 @@ export default {
         'uuid', //UUID
         'year', //YEAR
       ],
+      tab: 1,
     };
   },
   methods: {
     setStatusRow(row, status) {
       row.status = status;
     },
+    command(e) {
+      console.log(e)
+    },
+    focusField(field, index) {
+      let opt = {
+        index: index,
+        default: field.default,
+        comment: field.comment,
+        unsigned: field.unsigned,
+        autoincrement: field.autoincrement,
+      }
+      this.$emit('update:options', opt);
+    },
+    updateOptions() {
+      this.$emit('updateOtionsParent');
+    }
   },
 };
 </script>
 
+<style scoped>
+  .table-sm td, .table-sm th {
+    padding: 0 .1rem;
+  }
+
+  /* STYLING */
+  .container {  
+    max-width: 620px; 
+    min-width: 420px;
+    margin: 40px auto;
+    color: #888;
+  }
+
+  /* Style the tabs */
+  .tabs {
+    overflow: hidden;
+    margin-left: 20px;
+    margin-bottom: -2px;
+  }
+
+  .tabs ul {
+    list-style-type: none;
+    margin-left: 20px;
+  }
+
+  .tabs a{
+    float: left;
+    cursor: pointer;
+    padding: 12px 24px;
+    -webkit-transition: background-color 0.2s;
+    transition: background-color 0.2s;
+    background-color: #fff;
+  }
+
+  /* Change background color of tabs on hover */
+  .tabs a:hover {
+    background-color: #f1f1f1;
+  }
+
+  /* Styling for active tab */
+  .tabs a.active {
+    border-bottom: 2px solid #fff;
+    cursor: default;
+    background-color: #f1f1f1;
+    color: #007bff;
+    font-weight: 700;
+  }
+
+  /* Style the tab content */
+  .tabcontent {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 3px 3px 6px #e1e1e1
+  }
+
+  .material {
+    border: none;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .material:focus {
+    border-bottom: 2px solid #007bff;
+    box-shadow: none;
+  }
+
+  .material.border {
+    border: none !important;
+    border-bottom: 2px solid #dc3545 !important;
+  }
+</style>
