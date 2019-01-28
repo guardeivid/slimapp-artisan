@@ -6,10 +6,10 @@
         <a @click="tab=1" :class="{'active': tab === 1 }">Fields</a>
         <a @click="tab=2" :class="{'active': tab === 2 }">Indexes</a>
         <a @click="tab=3" :class="{'active': tab === 3 }">Foreign Keys</a>
-        <div v-if="tab === 1">
-          <a @click="addField">Add Field</a>
-          <a @click="insertField">Insert Field</a>
-          <a @click="deleteField">Delete Field</a>
+        <div v-if="tab === 1" class="btns">
+          <button @click="addField" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus"/> Add Field</button>
+          <button @click="insertField" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
+          <button @click="deleteField" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="plus"/> Delete Field</button>
         </div>
       </div>
       <div class="content">
@@ -32,11 +32,10 @@
               <tbody v-if="fields.length">
                 <tr v-for="(field, index) in fields" :key="index" @click="focusField(field, index)">
                   <td>
-                    <fa-icon icon="mug-hot" class="rowactive" v-if="index === table[0].rowactive"/>
-                    </i>
+                    <fa-icon icon="caret-right" class="rowactive" v-if="index === table[0].rowactive"/>
                   </td>
                   <td>
-                    <input type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="command" />
+                    <input :id="'field_'+index" type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="command" />
                   </td>
                   <td>
                     <select class="form-control form-control-sm material" required v-model="field.type" @change="command">
@@ -181,6 +180,7 @@ export default {
         { rowactive: 0 },
         { rowactive: 0 },
       ],
+      fieldvalidate: true,
     };
   },
   methods: {
@@ -207,7 +207,27 @@ export default {
       this.$emit('updateOtionsParent');
     },
     addField() {
-      console.log(this.tab);
+      if (this.fieldvalidate) {
+        this.fields.push({
+          name: '',
+          type: 'string',
+          total: 0,
+          decimal: 0,
+          notnull: false,
+          pk: false,
+          default: '',
+          comment: '',
+          valid: false,
+        });
+
+        this.fieldvalidate = false;
+      }
+
+      setTimeout(() => {
+        const id = `field_${(this.fields.length - 1)}`;
+        document.getElementById(id).focus();
+      }, 750);
+
     },
     insertField() {
       console.log(this);
@@ -273,6 +293,12 @@ export default {
     font-weight: 700;
   }
 
+  .btns {
+    float: right;
+    position: relative;
+    right: 25px;
+  }
+
   /* Style the tab content */
   .tabcontent {
     padding: 10px;
@@ -294,5 +320,9 @@ export default {
   .material.border {
     border: none !important;
     border-bottom: 2px solid #dc3545 !important;
+  }
+
+  svg.rowactive.svg-inline--fa {
+    vertical-align: middle;
   }
 </style>

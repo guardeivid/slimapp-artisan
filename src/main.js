@@ -1,11 +1,11 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCaretRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Vue from 'vue';
 import App from './App';
 import router from './router';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCoffee } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-library.add(faCoffee);
+library.add(faCaretRight, faPlus);
 
 Vue.component('fa-icon', FontAwesomeIcon);
 
