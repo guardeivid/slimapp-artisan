@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -42,7 +43,6 @@ export default {
         if (this.data.force) {
           cmd += ' --force';
         }
-
       }
 
       this.$parent.addCommand(cmd);

@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -42,12 +43,11 @@ export default {
         if (this.data.force) {
           cmd += ' --force';
         }
-
       }
 
       this.$parent.addCommand(cmd);
     },
-    submit() {      
+    submit() {
       if (!this.data.name) {
         return;
       }
@@ -55,7 +55,7 @@ export default {
       this.$parent.send('make/validation', this.data);
     },
     nameRule() {
-      if (!this.data.name){
+      if (!this.data.name) {
         return;
       }
       this.data.name = this.$parent.fillName(this.data.name, '');

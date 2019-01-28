@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -6,12 +7,12 @@
         <h4 class="mb-3">Opciones</h4>
         <div class="custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="slim" v-model="slim">
-            <label class="custom-control-label" for="slim">Utilizar rutas con formato <b>Slim</b> <em>$app->get(route, closure)</em></em>
+            <label class="custom-control-label" for="slim">Utilizar rutas con formato <b>Slim</b> <em>$app->get(route, closure)</em>
             </label>
         </div>
         <div class="custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="fill" v-model="fill">
-            <label class="custom-control-label" for="fill">Completar nombres de las clases automáticamente según el tipo?</em></em>
+            <label class="custom-control-label" for="fill">Completar nombres de las clases automáticamente según el tipo?
             </label>
         </div>
         <div class="custom-control custom-checkbox mb-3">
@@ -23,7 +24,6 @@
     </div>
     <hr>
   </div>
-
 </template>
 
 <script>
@@ -38,13 +38,13 @@ export default {
     };
   },
   watch: {
-    slim(e) {
+    slim() {
       this.$parent.setConfig('slim', this.slim);
     },
-    fill(e) {
+    fill() {
       this.$parent.setConfig('fill', this.fill);
     },
-    console(e) {
+    console() {
       this.$parent.setConfig('console', this.console);
     },
   },

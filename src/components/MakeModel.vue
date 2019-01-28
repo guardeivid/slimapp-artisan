@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -149,21 +150,21 @@ export default {
     return {
       data: {
         name: '',
-        //Generate a migration, factory, and resource controller for the model
+        // Generate a migration, factory, and resource controller for the model
         all: false,
-        //Create a new controller for the model
+        // Create a new controller for the model
         controller: false,
-        //Create a new factory for the model
+        // Create a new factory for the model
         factory: false,
-        //Create a new migration file for the model
+        // Create a new migration file for the model
         migration: false,
-        //Indicates if the generated model should be a custom intermediate table model
+        // Indicates if the generated model should be a custom intermediate table model
         pivot: false,
-        //Indicates if the generated controller should be a resource controller
+        // Indicates if the generated controller should be a resource controller
         resource: false,
-        //Create the class even if the model already exists
+        // Create the class even if the model already exists
         force: false,
-        //Options Model
+        // Options Model
         plain: true,
         soft: false,
         autopk: false,
@@ -173,7 +174,7 @@ export default {
         keytype: 'int',
         timestamps: true,
         created_at: 'created_at',
-        updated_at:'updated_at',
+        updated_at: 'updated_at',
         autofill: false,
         fillable: '',
         guarded: '*',
@@ -213,34 +214,34 @@ export default {
 
         if (!this.data.plain) {
           if (this.data.table) {
-            cmd += ' --table=' + this.data.table;
+            cmd += ` --table=${this.data.table}`;
           }
 
           if (this.data.autopk) {
             cmd += ' --autopk';
           } else {
-            if (this.data.primarykey != 'id') {
-              cmd += ' --pk=' + this.data.primarykey;
+            if (this.data.primarykey !== 'id') {
+              cmd += ` --pk=${this.data.primarykey}`;
             }
 
             if (!this.data.incrementing) {
               cmd += ' --no-incrementing';
             }
 
-            if (this.data.keytype != 'int') {
-              cmd += ' --keytype=' + this.data.keytype;
+            if (this.data.keytype !== 'int') {
+              cmd += ` --keytype=${this.data.keytype}`;
             }
           }
 
           if (!this.data.timestamps) {
             cmd += ' --no-timestamps';
           } else {
-            if (this.data.created_at != 'created_at') {
-              cmd += ' --created_at=' + this.data.created_at;
+            if (this.data.created_at !== 'created_at') {
+              cmd += ` --created_at=${this.data.created_at}`;
             }
 
-            if (this.data.updated_at != 'updated_at') {
-              cmd += ' --updated_at=' + this.data.updated_at;
+            if (this.data.updated_at !== 'updated_at') {
+              cmd += ` --updated_at=${this.data.updated_at}`;
             }
           }
 
@@ -252,14 +253,13 @@ export default {
             cmd += ' --autofill';
           } else {
             if (this.data.fillable) {
-              cmd += ' --fillable=' + this.data.fillable;
+              cmd += ` --fillable=${this.data.fillable}`;
             } else {
-              if (this.data.guarded != '*') {
-                cmd += ' --guarded=' + this.data.guarded;
+              if (this.data.guarded !== '*') {
+                cmd += ` --guarded=${this.data.guarded}`;
               }
             }
           }
-
         }
       }
 
@@ -282,7 +282,7 @@ export default {
     all() {
       if (this.data.all) {
         this.data.controller = true;
-        //this.data.factory = true; //no implementado
+        // this.data.factory = true; //no implementado
         this.data.migration = true;
         this.data.resource = true;
       }
@@ -299,13 +299,13 @@ export default {
       this.command();
     },
     cleanValueList(value, list) {
-      if (list == 'fillable') {
+      if (list === 'fillable') {
         if (value) {
           value = this.cleanValue(value);
         }
         this.data.fillable = value;
-      } else if (list == 'guarded') {
-        if (value && value != '*') {
+      } else if (list === 'guarded') {
+        if (value && value !== '*') {
           value = this.cleanValue(value);
         }
         this.data.guarded = value;
@@ -318,7 +318,7 @@ export default {
       if (!value) return value;
 
       value = value.split(',').join("', '");
-      return "'" + value + "'";
+      return `'${value}'`;
     },
   },
 };

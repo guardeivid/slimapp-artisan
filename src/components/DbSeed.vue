@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -13,7 +14,9 @@
           <label for="clase">Nombre de la clase raíz de los Seeder (opcional)</label>
           <select type="text" class="form-control" id="clase" placeholder="Class Seeder" v-model="data.clase" @change="command">
             <option></option>
-            <option v-for="option in config.seeds" :key="option" v-bind:value="option">{{ option }}</option>
+            <option v-for="option in config.seeds" :key="option" v-bind:value="option">
+              {{ option }}
+            </option>
           </select>
         </div>
         <br>
@@ -38,8 +41,8 @@ export default {
     return {
       data: {
         database: 'default',
-        clase   : '',
-        force   : false,
+        clase: '',
+        force: false,
       },
     };
   },
@@ -47,16 +50,16 @@ export default {
     command() {
       let cmd = '> php artisan db:seed';
 
-      if (this.data.clase != '') {
-        cmd += ' --class=' + this.data.clase;
+      if (this.data.clase !== '') {
+        cmd += ` --class=${this.data.clase}`;
       }
 
       if (this.data.force) {
         cmd += ' --force';
       }
 
-      if (this.data.database && this.data.database != 'default') {
-        cmd += ' --database=' + this.data.database;
+      if (this.data.database && this.data.database !== 'default') {
+        cmd += ` --database=${this.data.database}`;
       }
 
       this.$parent.addCommand(cmd);

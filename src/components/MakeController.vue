@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -74,13 +75,12 @@ export default {
         cmd += this.data.name;
 
         if (this.data.type) {
-          cmd += ' --' + this.data.type;
-        }
-        
-        if (this.data.model) {
-          cmd += ' --model=' + this.data.model;
+          cmd += ` --${this.data.type}`;
         }
 
+        if (this.data.model) {
+          cmd += ` --model=${this.data.model}`;
+        }
       }
 
       this.$parent.addCommand(cmd);
@@ -93,7 +93,7 @@ export default {
       this.$parent.send('make/controller', this.data);
     },
     nameController() {
-      if (!this.data.name){
+      if (!this.data.name) {
         return;
       }
       this.data.name = this.$parent.fillName(this.data.name, 'Controller');

@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div id="main">
       <nav class="navbar navbar-dark bg-dark flex-md-nowrap p-0 shadow">
         <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Artisan</a>
@@ -148,7 +149,7 @@ import Result from '@/components/Result';
 export default {
   name: 'App',
   components: {
-    Result
+    Result,
   },
   created() {
     this.fetchModels();
@@ -157,7 +158,7 @@ export default {
   data() {
     return {
       title: 'Dashboard',
-      host: 'http://localhost/slimapp/artisan', //location.href,
+      host: 'http://localhost/slimapp/artisan', // location.href,
       config: {
         slim: false,
         fill: true,
@@ -173,7 +174,7 @@ export default {
         info: [],
         error: [],
         notes: [],
-      }
+      },
     };
   },
   watch: {
@@ -205,11 +206,9 @@ export default {
         });
     },
     trim(string, char) {
-      if (char === "]") char = "\\]";
-      if (char === "\\") char = "\\\\";
-      return string.replace(new RegExp(
-        "^[" + char + "]+|[" + char + "]+$", "g"
-      ), "");
+      if (char === ']') char = '\\]';
+      if (char === '\\') char = '\\\\';
+      return string.replace(new RegExp(`^[${char}]+|[${char}]+$", "g"`), '');
     },
     fillName(name, fill) {
       let fillname = this.fixName(name);
@@ -231,45 +230,39 @@ export default {
       const self = this;
       axios({
         method: 'POST',
-        url: this.host + '/' + url,
-        //url: url,
+        url: `${this.host}/${url}`,
+        // url: url,
         data: Object.assign({}, this.config.csrf, data),
         headers: {
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
       })
-        .then(function (response) {
-          let cmd = self.result.notes[0];
+        .then((response) => {
+          const cmd = self.result.notes[0];
           if (response.data.notes) {
             self.result.notes = [cmd, '&nbsp;', ...response.data.notes];
           } else {
             if (self.config.console) {
               let info = response.data.info || [];
-              info = info.map(function(e){
-                return `<info>${e}</info>`;
-              });
+              info = info.map((e) => { return `<info>${e}</info>`; });
 
               let error = response.data.error || [];
-              error = error.map(function(e){
-                return `<critical>${e}</critical>`;
-              });
+              error = error.map((e) => { return `<critical>${e}</critical>`; });
 
               self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes, ...info, ...error] : [cmd, '&nbsp;', ...info, ...error];
             } else {
               self.result.info = response.data.info || [];
               self.result.error = response.data.error || [];
-              self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes, ...info, ...error] : [cmd, '&nbsp;', ...info, ...error];
+              self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes] : [cmd, '&nbsp;'];
             }
           }
 
-          if(callback) {
+          if (callback) {
             callback();
           }
         })
-        .catch(function (error) {
-          console.log(error);
-        });
+        .catch(error => console.log(error));
     },
     addCommand(cmd) {
       this.result.notes = [cmd];

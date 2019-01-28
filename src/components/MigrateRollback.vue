@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -53,9 +54,8 @@ export default {
       if (this.data.pretend) {
         cmd += ' --pretend';
       } else {
-
         if (this.data.step) {
-          cmd += ' --step=' + this.data.step;
+          cmd += ` --step=${this.data.step}`;
         }
 
         if (this.data.force) {
@@ -63,8 +63,8 @@ export default {
         }
       }
 
-      if (this.data.database && this.data.database != 'default') {
-        cmd += ' --database=' + this.data.database;
+      if (this.data.database && this.data.database !== 'default') {
+        cmd += ` --database=${this.data.database}`;
       }
 
       this.$parent.addCommand(cmd);

@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -31,8 +32,8 @@ export default {
     command() {
       let cmd = '> php artisan migrate:install';
 
-      if (this.data.database && this.data.database != 'default') {
-        cmd += ' --database=' + this.data.database;
+      if (this.data.database && this.data.database !== 'default') {
+        cmd += ` --database=${this.data.database}`;
       }
 
       this.$parent.addCommand(cmd);

@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -65,19 +66,19 @@ export default {
       let cmd = '> php artisan route:list';
 
       if (this.data.method) {
-        cmd += ' --method=' + this.data.method;
+        cmd += ` --method=${this.data.method}`;
       }
 
       if (this.data.name) {
-        cmd += ' --name=' + this.data.name;
+        cmd += ` --name=${this.data.name}`;
       }
 
       if (this.data.path) {
-        cmd += ' --path=' + this.data.path;
+        cmd += ` --path=${this.data.path}`;
       }
 
       if (this.data.sort) {
-        cmd += ' --sort=' + this.data.sort;
+        cmd += ` --sort=${this.data.sort}`;
       }
 
       if (this.data.reverse) {

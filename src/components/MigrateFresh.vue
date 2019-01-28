@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -80,7 +81,6 @@ export default {
       if (this.data.pretend) {
         cmd += ' --pretend';
       } else {
-
         if (this.data.dropview) {
           cmd += ' --drop-views';
         }
@@ -91,8 +91,8 @@ export default {
 
         if (this.data.seed) {
           cmd += ' --seed';
-          if (this.data.clase != '') {
-            cmd += ' --class=' + this.data.clase;
+          if (this.data.clase !== '') {
+            cmd += ` --class=${this.data.clase}`;
           }
         }
 
@@ -101,8 +101,8 @@ export default {
         }
       }
 
-      if (this.data.database && this.data.database != 'default') {
-        cmd += ' --database=' + this.data.database;
+      if (this.data.database && this.data.database !== 'default') {
+        cmd += ` --database=${this.data.database}`;
       }
 
       this.$parent.addCommand(cmd);

@@ -19,7 +19,7 @@ import DbSeed from '@/components/DbSeed';
 Vue.use(Router);
 
 export default new Router({
-  //base: '/slimapp/artisan/',
+  // base: '/slimapp/artisan/',
   linkExactActiveClass: 'active',
   mode: 'history',
   routes: [

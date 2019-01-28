@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <div class="hello">
     <p class="lead"></p>
     <div class="row">
@@ -30,7 +31,7 @@
 </template>
 
 <script>
-//<pre>{{ $data }}, {{ $props }}</pre>
+// <pre>{{ $data }}, {{ $props }}</pre>
 export default {
   name: 'MakeSeeder',
   props: ['config'],
@@ -51,11 +52,11 @@ export default {
         cmd += this.data.name;
 
         if (this.data.model) {
-          cmd += " --model=" + this.data.model;
+          cmd += ` --model=${this.data.model}`;
         }
 
         if (this.data.force) {
-          cmd += " --force";
+          cmd += ' --force';
         }
       }
 
