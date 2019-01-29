@@ -7,9 +7,9 @@
         <a @click="tab=2" :class="{'active': tab === 2 }">Indexes</a>
         <a @click="tab=3" :class="{'active': tab === 3 }">Foreign Keys</a>
         <div v-if="tab === 1" class="btns">
-          <button @click="addField" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus"/> Add Field</button>
-          <button @click="insertField" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
-          <button @click="deleteField" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="plus"/> Delete Field</button>
+          <button @click="addField(fields.length)" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Field</button>
+          <button @click="addField(table[0].rowactive)" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
+          <button @click="deleteField(table[0].rowactive)" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Field</button>
         </div>
       </div>
       <div class="content">
@@ -25,8 +25,8 @@
                   <th>Decimals</th>
                   <th>Not Null</th>
                   <th>Primary Key</th>
-                  <th></th>
-                  <!--<th>Comment</th>-->
+                  <!--<th></th>
+                  <th>Comment</th>-->
                 </tr>
               </thead>
               <tbody v-if="fields.length">
@@ -35,7 +35,7 @@
                     <fa-icon icon="caret-right" class="rowactive" v-if="index === table[0].rowactive"/>
                   </td>
                   <td>
-                    <input :id="'field_'+index" type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="command" />
+                    <input :id="'field_'+index" type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="setValid(field)" />
                   </td>
                   <td>
                     <select class="form-control form-control-sm material" required v-model="field.type" @change="command">
@@ -75,25 +75,33 @@
           </div>
           <div>
             <div class="row">
-              <label for="inputdefault" class="col-sm-2 col-form-label">Default</label>
-              <div class="col-sm-6">
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  id="inputdefault"
-                  v-model="options.default"
-                  @change="updateOptions">
+              <div class="col-md-8">
+                <label for="inputdefault" class="col-sm-4 col-form-label">Default</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" id="inputdefault" v-model="options.default" @change="updateOptions">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="custom-control custom-checkbox mb-3 ml-2">
+                  <input type="checkbox" class="custom-control-input" v-model="options.autoincrement"  @change="updateOptions" id="inputautoincrement">
+                  <label class="custom-control-label" for="inputautoincrement"> Auto-incrementing
+                  </label>
+                </div>
               </div>
             </div>
             <div class="row">
-              <label for="inputcomment" class="col-sm-2 col-form-label">Comment</label>
-              <div class="col-sm-6">
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  id="inputcomment"
-                  v-model="options.comment"
-                  @change="updateOptions">
+              <div class="col-md-8">
+                <label for="inputcomment" class="col-sm-4 col-form-label">Comment</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" id="inputcomment" v-model="options.comment" @change="updateOptions">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="custom-control custom-checkbox mb-3 ml-2">
+                  <input type="checkbox" class="custom-control-input" v-model="options.unsigned"  @change="updateOptions" id="inputunsigned">
+                  <label class="custom-control-label" for="inputunsigned"> Unsigned
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -180,35 +188,46 @@ export default {
         { rowactive: 0 },
         { rowactive: 0 },
       ],
-      fieldvalidate: true,
+      fieldvalidate: false,
     };
   },
   methods: {
-    setStatusRow(row, status) {
-      row.status = status;
-    },
     command(e) {
       console.log(e);
     },
     focusField(field, index) {
-      const opt = {
-        index,
-        default: field.default,
-        comment: field.comment,
-        unsigned: field.unsigned,
-        autoincrement: field.autoincrement,
-      };
+      const prev = this.table[0].rowactive;
+      if (prev !== index && prev !== 0 && this.fields.length > prev && !this.fields[prev].valid) {
+        this.deleteField(prev);
+      }
 
-      this.table[0].rowactive = index;
+      if (prev !== index) {
+        const opt = {
+          index,
+          default: field.default,
+          comment: field.comment,
+          unsigned: field.unsigned,
+          autoincrement: field.autoincrement,
+        };
 
-      this.$emit('update:options', opt);
+        this.table[0].rowactive = index;
+
+        this.$emit('update:options', opt);
+      }
+    },
+    setValid(field) {
+      if (field) {
+        field.valid = true;
+      }
+      this.fieldvalidate = true;
     },
     updateOptions() {
       this.$emit('updateOtionsParent');
     },
-    addField() {
+    addField(idx) {
+      let add = false;
       if (this.fieldvalidate) {
-        this.fields.push({
+        this.fields.splice(idx, 0, {
           name: '',
           type: 'string',
           total: 0,
@@ -217,23 +236,39 @@ export default {
           pk: false,
           default: '',
           comment: '',
+          unsigned: false,
+          autoincrement: false,
           valid: false,
         });
 
         this.fieldvalidate = false;
+        add = true;
       }
 
       setTimeout(() => {
-        const id = `field_${(this.fields.length - 1)}`;
-        document.getElementById(id).focus();
-      }, 750);
+        if (!add) {
+          idx = (this.fields.length > 0) ? this.fields.length - 1 : 0;
+        }
+        const id = `field_${idx}`;
+        const el = document.getElementById(id);
 
+        if (el) {
+          el.click();
+          el.focus();
+        }
+      }, 100);
     },
-    insertField() {
-      console.log(this);
-    },
-    deleteField() {
-      console.log(this);
+    deleteField(idx) {
+      this.fields.splice(idx, 1);
+      this.setValid();
+
+      const nidx = idx > 0 ? idx - 1 : 0;
+
+      if (this.fields.length === 0) {
+        this.addField(0);
+      } else {
+        this.focusField(this.fields[nidx], nidx);
+      }
     },
   },
 };
