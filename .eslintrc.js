@@ -2,6 +2,7 @@
 
 module.exports = {
   root: true,
+  esversion: 6,
   parserOptions: {
     parser: 'babel-eslint'
   },

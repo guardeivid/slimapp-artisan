@@ -7,9 +7,9 @@
         <a @click="tab=2" :class="{'active': tab === 2 }">Indexes</a>
         <a @click="tab=3" :class="{'active': tab === 3 }">Foreign Keys</a>
         <div v-if="tab === 1" class="btns">
-          <button @click="addField(fields.length)" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Field</button>
-          <button @click="addField(table[0].rowactive)" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
-          <button @click="deleteField(table[0].rowactive)" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Field</button>
+          <button @click="addField(fields.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Field</button>
+          <button @click="addField(table[0].rowactive);" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
+          <button @click="deleteField(table[0].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Field</button>
         </div>
       </div>
       <div class="content">
