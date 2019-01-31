@@ -11,6 +11,10 @@
           <button @click="addField(table[0].rowactive);" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
           <button @click="deleteField(table[0].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Field</button>
         </div>
+        <div v-if="tab === 2" class="btns">
+          <button @click="addIndex(indexes.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Index</button>
+          <button @click="deleteIndex(table[1].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Index</button>
+        </div>
       </div>
       <div class="content">
         <div class="col-md mb-3 tabcontent" v-if="tab == 1">
@@ -23,7 +27,7 @@
                   <th>Type</th>
                   <th>Length</th>
                   <th>Decimals</th>
-                  <th>Not Null</th>
+                  <th>Allow Null</th>
                   <th>Primary Key</th>
                   <!--<th></th>
                   <th>Comment</th>-->
@@ -39,7 +43,6 @@
                   </td>
                   <td>
                     <select class="form-control form-control-sm material" required v-model="field.type" @change="command">
-                      <option></option>
                       <option v-for="type in types" :key="type" v-bind:value="type">
                         {{ type }}
                       </option>
@@ -53,8 +56,8 @@
                   </td>
                   <td>
                     <div class="custom-control custom-checkbox mb-3 ml-2">
-                      <input type="checkbox" class="custom-control-input" v-model="field.notnull" @change="command" :id="`notnull_${index}`">
-                      <label class="custom-control-label" :for="`notnull_${index}`"> </label>
+                      <input type="checkbox" class="custom-control-input" v-model="field.allownull" @change="command" :id="`allownull_${index}`">
+                      <label class="custom-control-label" :for="`allownull_${index}`"> </label>
                     </div>
                   </td>
                   <td>
@@ -76,9 +79,11 @@
           <div>
             <div class="row">
               <div class="col-md-8">
-                <label for="inputdefault" class="col-sm-4 col-form-label">Default</label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control form-control-sm" id="inputdefault" v-model="options.default" @change="updateOptions">
+                <div class="form-group row">
+                  <label for="inputdefault" class="col-sm-3 col-form-label">Default</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control form-control-sm" id="inputdefault" v-model="options.default" @change="updateOptions">
+                  </div>
                 </div>
               </div>
               <div class="col-md-4">
@@ -91,9 +96,11 @@
             </div>
             <div class="row">
               <div class="col-md-8">
-                <label for="inputcomment" class="col-sm-4 col-form-label">Comment</label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control form-control-sm" id="inputcomment" v-model="options.comment" @change="updateOptions">
+                <div class="form-group row">
+                  <label for="inputcomment" class="col-sm-3 col-form-label">Comment</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control form-control-sm" id="inputcomment" v-model="options.comment" @change="updateOptions">
+                  </div>
                 </div>
               </div>
               <div class="col-md-4">
@@ -107,7 +114,39 @@
           </div>
         </div>
         <div class="col-md mb-3 table-responsive tabcontent" v-if="tab == 2">
-          Indexes
+          <div class="table-responsive ">
+            <table class="table table-sm table-borderless">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Name (Optional)</th>
+                  <th>Fields</th>
+                  <th>Index Type</th>
+                </tr>
+              </thead>
+              <tbody v-if="indexes.length">
+                <tr v-for="(field, index) in indexes" :key="index" @click="focusIndex(field, index)">
+                  <td>
+                    <fa-icon icon="caret-right" class="rowactive" v-if="index === table[1].rowactive"/>
+                  </td>
+                  <td>
+                    <input :id="'index_'+index" type="text" class="form-control form-control-sm material" v-model="field.name" @change="command" />
+                  </td>
+                  <td>
+                    <design-field :fields="fields" :field.sync="field.fields" @setValid="setIndexValid(field)">
+                    </design-field>
+                  </td>
+                  <td>
+                    <select class="form-control form-control-sm material" required v-model="field.type">
+                      <option v-for="type in indexTypes" :key="type" v-bind:value="type">
+                        {{ type }}
+                      </option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="col-md mb-3 table-responsive tabcontent" v-if="tab == 3">
           Foreign Keys
@@ -118,10 +157,14 @@
 </template>
 
 <script>
+import DesignField from '@/components/DesignFields';
 
 export default {
   name: 'DesignTable',
-  props: ['fields', 'options'],
+  components: {
+    DesignField,
+  },
+  props: ['fields', 'options', 'indexes'],
   data() {
     return {
       types: [
@@ -189,12 +232,15 @@ export default {
         { rowactive: 0 },
       ],
       fieldvalidate: false,
+      indexTypes: ['primary', 'unique', 'index', 'spatialIndex'],
+      indexvalidate: false,
     };
   },
   methods: {
     command(e) {
       console.log(e);
     },
+    // Fields
     focusField(field, index) {
       const prev = this.table[0].rowactive;
       if (prev !== index && prev !== 0 && this.fields.length > prev && !this.fields[prev].valid) {
@@ -232,7 +278,7 @@ export default {
           type: 'string',
           total: 0,
           decimal: 0,
-          notnull: false,
+          allownull: false,
           pk: false,
           default: '',
           comment: '',
@@ -268,6 +314,60 @@ export default {
         this.addField(0);
       } else {
         this.focusField(this.fields[nidx], nidx);
+      }
+    },
+    // Indexes
+    focusIndex(field, index) {
+      const prev = this.table[1].rowactive;
+      if (prev !== index && prev !== 0 && this.indexes.length > prev && !this.indexes[prev].valid) {
+        this.deleteIndex(prev);
+      }
+
+      this.table[1].rowactive = index;
+    },
+    setIndexValid(field) {
+      if (field) {
+        field.valid = true;
+      }
+      this.indexvalidate = true;
+    },
+    addIndex(idx) {
+      let add = false;
+      if (this.indexvalidate) {
+        this.indexes.splice(idx, 0, {
+          name: '',
+          fields: '',
+          type: 'index',
+          valid: false,
+        });
+
+        this.indexvalidate = false;
+        add = true;
+      }
+
+      setTimeout(() => {
+        if (!add) {
+          idx = (this.indexes.length > 0) ? this.indexes.length - 1 : 0;
+        }
+        const id = `index_${idx}`;
+        const el = document.getElementById(id);
+
+        if (el) {
+          el.click();
+          el.focus();
+        }
+      }, 100);
+    },
+    deleteIndex(idx) {
+      this.indexes.splice(idx, 1);
+      this.setIndexValid();
+
+      const nidx = idx > 0 ? idx - 1 : 0;
+
+      if (this.indexes.length === 0) {
+        this.addIndex(0);
+      } else {
+        this.focusIndex(this.indexes[nidx], nidx);
       }
     },
   },

@@ -30,7 +30,7 @@
         </div>
       </div>
     </div>
-    <design-table :fields="data.fields" :options.sync="options" @updateOtionsParent="updateOptions">
+    <design-table :fields="data.fields" :options.sync="options" @updateOtionsParent="updateOptions" :indexes="data.indexes">
     </design-table>
     <div class="row">
       <div class="col-md-6 mb-3 d-flex align-items-center">
@@ -70,12 +70,18 @@ export default {
           type: 'string',
           total: 0,
           decimal: 0,
-          notnull: false,
+          allownull: false,
           pk: false,
           default: '',
           comment: '',
           unsigned: false,
           autoincrement: false,
+          valid: false,
+        }],
+        indexes: [{
+          name: '',
+          fields: '',
+          type: 'index',
           valid: false,
         }],
       },
