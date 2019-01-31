@@ -7,17 +7,17 @@
         <a @click="tab=2" :class="{'active': tab === 2 }">Indexes</a>
         <a @click="tab=3" :class="{'active': tab === 3 }">Foreign Keys</a>
         <div v-if="tab === 1" class="btns">
-          <button @click="addField(fields.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Field</button>
-          <button @click="addField(table[0].rowactive);" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
-          <button @click="deleteField(table[0].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Field</button>
+          <button @click="add('fields', fields.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Field</button>
+          <button @click="add('fields', table[0].rowactive);" type="button" class="btn btn-outline-warning btn-sm"><fa-icon icon="plus"/> Insert Field</button>
+          <button @click="remove('fields', 0, table[0].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Field</button>
         </div>
         <div v-if="tab === 2" class="btns">
-          <button @click="addIndex(indexes.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Index</button>
-          <button @click="deleteIndex(table[1].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Index</button>
+          <button @click="add('indexes', indexes.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Index</button>
+          <button @click="remove('indexes', 1, table[1].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Index</button>
         </div>
         <div v-if="tab === 3" class="btns">
-          <button @click="addForeign(foreigns.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Foreign</button>
-          <button @click="deleteForeign(table[2].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Foreign</button>
+          <button @click="add('foreigns', foreigns.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Foreign</button>
+          <button @click="remove('foreigns', 2, table[2].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Foreign</button>
         </div>
       </div>
       <div class="content">
@@ -38,16 +38,16 @@
                 </tr>
               </thead>
               <tbody v-if="fields.length">
-                <tr v-for="(field, index) in fields" :key="index" @click="focusField(field, index)">
+                <tr v-for="(field, index) in fields" :key="index" @click="focus('fields', 0, field, index)">
                   <td>
                     <fa-icon icon="caret-right" class="rowactive" v-if="index === table[0].rowactive"/>
                   </td>
                   <td>
-                    <input :id="'field_'+index" type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="setValid(field)" />
+                    <input :id="'field_'+index" type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="setValid('fields', field)" />
                   </td>
                   <td>
-                    <select class="form-control form-control-sm material" required v-model="field.type" @change="command">
-                      <option v-for="type in types" :key="type" v-bind:value="type">
+                    <select class="form-control form-control-sm material" required v-model="field.type" @change="fieldType(field)">
+                      <option v-for="type in types" :key="type" :value="type">
                         {{ type }}
                       </option>
                     </select>
@@ -117,7 +117,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md mb-3 table-responsive tabcontent" v-if="tab == 2">
+        <div class="col-md mb-3 tabcontent" v-if="tab == 2">
           <div class="table-responsive ">
             <table class="table table-sm table-borderless">
               <thead>
@@ -129,7 +129,7 @@
                 </tr>
               </thead>
               <tbody v-if="indexes.length">
-                <tr v-for="(field, index) in indexes" :key="index" @click="focusIndex(field, index)">
+                <tr v-for="(field, index) in indexes" :key="index" @click="focus('indexes', 1, field, index)">
                   <td>
                     <fa-icon icon="caret-right" class="rowactive" v-if="index === table[1].rowactive"/>
                   </td>
@@ -137,7 +137,7 @@
                     <input :id="'index_'+index" type="text" class="form-control form-control-sm material" v-model="field.name" @change="command" />
                   </td>
                   <td>
-                    <design-field :fields="fields" :field.sync="field.fields" @setValid="setIndexValid(field)">
+                    <design-field :fields="fields" :field.sync="field.fields" @setValid="setValid('indexes', field)">
                     </design-field>
                   </td>
                   <td>
@@ -152,7 +152,7 @@
             </table>
           </div>
         </div>
-        <div class="col-md mb-3 table-responsive tabcontent" v-if="tab == 3">
+        <div class="col-md mb-3 tabcontent" v-if="tab == 3">
           <div class="table-responsive ">
             <table class="table table-sm table-borderless">
               <thead>
@@ -167,7 +167,7 @@
                 </tr>
               </thead>
               <tbody v-if="foreigns.length">
-                <tr v-for="(field, index) in foreigns" :key="index" @click="focusForeign(field, index)">
+                <tr v-for="(field, index) in foreigns" :key="index" @click="focus('foreigns', 2, field, index)">
                   <td>
                     <fa-icon icon="caret-right" class="rowactive" v-if="index === table[2].rowactive"/>
                   </td>
@@ -175,7 +175,7 @@
                     <input :id="'foreign_'+index" type="text" class="form-control form-control-sm material" v-model="field.name" @change="command" />
                   </td>
                   <td>
-                    <design-field :fields="fields" :field.sync="field.fields" @setValid="setForeignValid(field)">
+                    <design-field :fields="fields" :field.sync="field.fields" @setValid="setValid('foreigns', field)">
                     </design-field>
                   </td>
                   <td>
@@ -296,203 +296,20 @@ export default {
     command(e) {
       console.log(e);
     },
-    // Fields
-    focusField(field, index) {
-      const prev = this.table[0].rowactive;
-      if (prev !== index && prev !== 0 && this.fields.length > prev && !this.fields[prev].valid) {
-        this.deleteField(prev);
-      }
-
-      if (prev !== index) {
-        const opt = {
-          index,
-          default: field.default,
-          comment: field.comment,
-          unsigned: field.unsigned,
-          autoincrement: field.autoincrement,
-        };
-
-        this.table[0].rowactive = index;
-
-        this.$emit('update:options', opt);
-      }
+    fieldType(field) {
+      if (field.type)
     },
-    setValid(field) {
-      if (field) {
-        field.valid = true;
-      }
-      this.fieldvalidate = true;
+    isNumber(type) {
+      const numbers = ['bigInteger','decimal','double','float','integer','mediumInteger','smallInteger'];
+      return numbers.indexOf("type") === -1 ? false : true;
     },
     updateOptions() {
       this.$emit('updateOtionsParent');
     },
-    addField(idx) {
-      let add = false;
-      if (this.fieldvalidate) {
-        this.fields.splice(idx, 0, {
-          name: '',
-          type: 'string',
-          total: 0,
-          decimal: 0,
-          allownull: false,
-          pk: false,
-          default: '',
-          comment: '',
-          unsigned: false,
-          autoincrement: false,
-          valid: false,
-        });
-
-        this.fieldvalidate = false;
-        add = true;
-      }
-
-      setTimeout(() => {
-        if (!add) {
-          idx = (this.fields.length > 0) ? this.fields.length - 1 : 0;
-        }
-        const id = `field_${idx}`;
-        const el = document.getElementById(id);
-
-        if (el) {
-          el.click();
-          el.focus();
-        }
-      }, 100);
-    },
-    deleteField(idx) {
-      this.fields.splice(idx, 1);
-      this.setValid();
-
-      const nidx = idx > 0 ? idx - 1 : 0;
-
-      if (this.fields.length === 0) {
-        this.addField(0);
-      } else {
-        this.focusField(this.fields[nidx], nidx);
-      }
-    },
-    // Indexes
-    focusIndex(field, index) {
-      const prev = this.table[1].rowactive;
-      if (prev !== index && prev !== 0 && this.indexes.length > prev && !this.indexes[prev].valid) {
-        this.deleteIndex(prev);
-      }
-
-      this.table[1].rowactive = index;
-    },
-    setIndexValid(field) {
-      if (field) {
-        field.valid = true;
-      }
-      this.indexvalidate = true;
-    },
-    addIndex(idx) {
-      let add = false;
-      if (this.indexvalidate) {
-        this.indexes.splice(idx, 0, {
-          name: '',
-          fields: '',
-          type: 'index',
-          valid: false,
-        });
-
-        this.indexvalidate = false;
-        add = true;
-      }
-
-      setTimeout(() => {
-        if (!add) {
-          idx = (this.indexes.length > 0) ? this.indexes.length - 1 : 0;
-        }
-        const id = `index_${idx}`;
-        const el = document.getElementById(id);
-
-        if (el) {
-          el.click();
-          el.focus();
-        }
-      }, 100);
-    },
-    deleteIndex(idx) {
-      this.indexes.splice(idx, 1);
-      this.setIndexValid();
-
-      const nidx = idx > 0 ? idx - 1 : 0;
-
-      if (this.indexes.length === 0) {
-        const self = this;
-        setTimeout(() => {
-          self.addIndex(0);
-        }, 10);
-      } else {
-        this.focusIndex(this.indexes[nidx], nidx);
-      }
-    },
-    // Foreigns
-    addForeign(idx) {
-      let add = false;
-      if (this.foreignvalidate) {
-        this.foreigns.splice(idx, 0, {
-          name: '',
-          fields: '',
-          reftable: '',
-          reffields: '',
-          ondelete: '',
-          onupdate: '',
-          valid: false,
-        });
-
-        this.foreignvalidate = false;
-        add = true;
-      }
-
-      setTimeout(() => {
-        if (!add) {
-          idx = (this.foreigns.length > 0) ? this.foreigns.length - 1 : 0;
-        }
-        const id = `foreign_${idx}`;
-        const el = document.getElementById(id);
-
-        if (el) {
-          el.click();
-          el.focus();
-        }
-      }, 100);
-    },
-    deleteForeign(idx) {
-      this.foreigns.splice(idx, 1);
-      this.setForeignValid();
-
-      const nidx = idx > 0 ? idx - 1 : 0;
-
-      if (this.foreigns.length === 0) {
-        const self = this;
-        setTimeout(() => {
-          self.addForeign(0);
-        }, 10);
-      } else {
-        this.focusForeign(this.foreigns[nidx], nidx);
-      }
-    },
-    focusForeign(field, index) {
-      const prev = this.table[2].rowactive;
-      if (prev !== index && prev !== 0 && this.foreigns.length > prev && !this.foreigns[prev].valid) {
-        this.deleteForeign(prev);
-      }
-
-      this.table[2].rowactive = index;
-    },
-    setForeignValid(field) {
-      if (field) {
-        field.valid = true;
-      }
-      this.foreignvalidate = true;
-    },
     focus(type, tid, field, index) {
       const prev = this.table[tid].rowactive;
       if (prev !== index && prev !== 0 && this[type].length > prev && !this[type][prev].valid) {
-        this.delete(type, tid, prev);
+        this.remove(type, tid, prev);
       }
 
       if (prev !== index) {
@@ -510,23 +327,53 @@ export default {
         this.table[tid].rowactive = index;
       }
     },
-    delete(type, tid, idx) {
+    remove(type, tid, idx) {
       this[type].splice(idx, 1);
-      this.setValid();
+      this.setValid(type);
 
       const nidx = idx > 0 ? idx - 1 : 0;
 
       if (this[type].length === 0) {
         const self = this;
         setTimeout(() => {
-          self.add(type, tid, 0);
+          self.add(type, 0);
         }, 10);
       } else {
         this.focus(type, tid, this[type][nidx], nidx);
       }
     },
-    add(type, tid, idx) {
-      let props, name;
+    add(type, idx) {
+      const [name, props] = this.get(type);
+      let add = false;
+      if (this[`${name}validate`]) {
+        this[type].splice(idx, 0, props);
+        this[`${name}validate`] = false;
+        add = true;
+      }
+
+      setTimeout(() => {
+        if (!add) {
+          idx = (this[type].length > 0) ? this[type].length - 1 : 0;
+        }
+        const id = `${name}_${idx}`;
+        const el = document.getElementById(id);
+
+        if (el) {
+          el.click();
+          el.focus();
+        }
+      }, 100);
+    },
+    setValid(type, field) {
+      if (field) {
+        field.valid = true;
+      }
+      const [name, props] = this.get(type);
+      this[`${name}validate`] = true;
+    },
+    get(type) {
+      let props;
+      let name;
       switch (type) {
         case 'fields':
           name = 'field';
@@ -565,32 +412,10 @@ export default {
             valid: false,
           };
           break;
-      }
-      let add = false;
-      if (this[name + 'validate']) {
-        this[type].splice(idx, 0, props);
-        this[name + 'validate'] = false;
-        add = true;
-      }
 
-      setTimeout(() => {
-        if (!add) {
-          idx = (this[type].length > 0) ? this[type].length - 1 : 0;
-        }
-        const id = `${name}_${idx}`;
-        const el = document.getElementById(id);
-
-        if (el) {
-          el.click();
-          el.focus();
-        }
-      }, 100);
-    },
-    setValid(field) {
-      if (field) {
-        field.valid = true;
+        // no default
       }
-      this.fieldvalidate = true;
+      return [name, props];
     },
   },
 };

@@ -2,9 +2,9 @@
   <!-- eslint-disable max-len -->
   <div>
     <div class="input-group mb-3">
-      <input type="text" class="form-control form-control-sm material" readonly @click="showModal = true" v-model="field" required :class="{ 'border border-danger': !field }">
+      <input type="text" class="form-control form-control-sm material" readonly @click="open" v-model="field" required :class="{ 'border border-danger': !field }">
       <div class="input-group-append">
-        <button class="btn btn-light btn-sm" type="button" @click="showModal = true">...</button>
+        <button class="btn btn-light btn-sm" type="button" @click="open">...</button>
       </div>
     </div>
 
@@ -61,9 +61,16 @@ export default {
       this.$emit('setValid');
       this.showModal = false;
     },
+    open() {
+      this.setFields();
+      this.showModal = true;
+    },
     close() {
-      this.checkedFields = this.field === '' ? [] : this.field.split(', ');
+      this.setFields();
       this.showModal = false;
+    },
+    setFields() {
+      this.checkedFields = this.field === '' ? [] : this.field.split(', ');
     },
   },
 };
