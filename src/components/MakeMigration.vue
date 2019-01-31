@@ -30,7 +30,7 @@
         </div>
       </div>
     </div>
-    <design-table :fields="data.fields" :options.sync="options" @updateOtionsParent="updateOptions" :indexes="data.indexes">
+    <design-table :fields="data.fields" :options.sync="options" @updateOtionsParent="updateOptions" :indexes="data.indexes" :foreigns="data.foreigns">
     </design-table>
     <div class="row">
       <div class="col-md-6 mb-3 d-flex align-items-center">
@@ -82,6 +82,15 @@ export default {
           name: '',
           fields: '',
           type: 'index',
+          valid: false,
+        }],
+        foreigns: [{
+          name: '',
+          fields: '',
+          reftable: '',
+          reffields: '',
+          ondelete: '',
+          onupdate: '',
           valid: false,
         }],
       },

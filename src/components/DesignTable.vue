@@ -15,6 +15,10 @@
           <button @click="addIndex(indexes.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Index</button>
           <button @click="deleteIndex(table[1].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Index</button>
         </div>
+        <div v-if="tab === 3" class="btns">
+          <button @click="addForeign(foreigns.length);" type="button" class="btn btn-outline-success btn-sm"><fa-icon icon="plus-circle"/> Add Foreign</button>
+          <button @click="deleteForeign(table[2].rowactive);" type="button" class="btn btn-outline-danger btn-sm"><fa-icon icon="minus-circle"/> Delete Foreign</button>
+        </div>
       </div>
       <div class="content">
         <div class="col-md mb-3 tabcontent" v-if="tab == 1">
@@ -138,7 +142,7 @@
                   </td>
                   <td>
                     <select class="form-control form-control-sm material" required v-model="field.type">
-                      <option v-for="type in indexTypes" :key="type" v-bind:value="type">
+                      <option v-for="type in indexTypes" :key="type" :value="type">
                         {{ type }}
                       </option>
                     </select>
@@ -149,7 +153,57 @@
           </div>
         </div>
         <div class="col-md mb-3 table-responsive tabcontent" v-if="tab == 3">
-          Foreign Keys
+          <div class="table-responsive ">
+            <table class="table table-sm table-borderless">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Name (Optional)</th>
+                  <th>Fields</th>
+                  <th>Referenced Table</th>
+                  <th>Referenced Fields</th>
+                  <th>On Delete</th>
+                  <th>On Update</th>
+                </tr>
+              </thead>
+              <tbody v-if="foreigns.length">
+                <tr v-for="(field, index) in foreigns" :key="index" @click="focusForeign(field, index)">
+                  <td>
+                    <fa-icon icon="caret-right" class="rowactive" v-if="index === table[2].rowactive"/>
+                  </td>
+                  <td>
+                    <input :id="'foreign_'+index" type="text" class="form-control form-control-sm material" v-model="field.name" @change="command" />
+                  </td>
+                  <td>
+                    <design-field :fields="fields" :field.sync="field.fields" @setValid="setForeignValid(field)">
+                    </design-field>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control form-control-sm material" required v-model="field.reftable" @change="command" :class="{ 'border border-danger': !field.reftable }" />
+                  </td>
+                  <td>
+                    <input type="text" class="form-control form-control-sm material" required v-model="field.reffields" @change="command" :class="{ 'border border-danger': !field.reffields }" />
+                  </td>
+                  <td>
+                    <select class="form-control form-control-sm material" v-model="field.ondelete">
+                      <option></option>
+                      <option v-for="action in actions" :key="action" :value="action">
+                        {{ action }}
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-control form-control-sm material" v-model="field.onupdate">
+                      <option></option>
+                      <option v-for="action in actions" :key="action" :value="action">
+                        {{ action }}
+                      </option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -164,7 +218,7 @@ export default {
   components: {
     DesignField,
   },
-  props: ['fields', 'options', 'indexes'],
+  props: ['fields', 'options', 'indexes', 'foreigns'],
   data() {
     return {
       types: [
@@ -234,6 +288,8 @@ export default {
       fieldvalidate: false,
       indexTypes: ['primary', 'unique', 'index', 'spatialIndex'],
       indexvalidate: false,
+      actions: ['restrict', 'no action', 'cascade', 'set null', 'set default'],
+      foreignvalidate: false,
     };
   },
   methods: {
@@ -365,10 +421,176 @@ export default {
       const nidx = idx > 0 ? idx - 1 : 0;
 
       if (this.indexes.length === 0) {
-        this.addIndex(0);
+        const self = this;
+        setTimeout(() => {
+          self.addIndex(0);
+        }, 10);
       } else {
         this.focusIndex(this.indexes[nidx], nidx);
       }
+    },
+    // Foreigns
+    addForeign(idx) {
+      let add = false;
+      if (this.foreignvalidate) {
+        this.foreigns.splice(idx, 0, {
+          name: '',
+          fields: '',
+          reftable: '',
+          reffields: '',
+          ondelete: '',
+          onupdate: '',
+          valid: false,
+        });
+
+        this.foreignvalidate = false;
+        add = true;
+      }
+
+      setTimeout(() => {
+        if (!add) {
+          idx = (this.foreigns.length > 0) ? this.foreigns.length - 1 : 0;
+        }
+        const id = `foreign_${idx}`;
+        const el = document.getElementById(id);
+
+        if (el) {
+          el.click();
+          el.focus();
+        }
+      }, 100);
+    },
+    deleteForeign(idx) {
+      this.foreigns.splice(idx, 1);
+      this.setForeignValid();
+
+      const nidx = idx > 0 ? idx - 1 : 0;
+
+      if (this.foreigns.length === 0) {
+        const self = this;
+        setTimeout(() => {
+          self.addForeign(0);
+        }, 10);
+      } else {
+        this.focusForeign(this.foreigns[nidx], nidx);
+      }
+    },
+    focusForeign(field, index) {
+      const prev = this.table[2].rowactive;
+      if (prev !== index && prev !== 0 && this.foreigns.length > prev && !this.foreigns[prev].valid) {
+        this.deleteForeign(prev);
+      }
+
+      this.table[2].rowactive = index;
+    },
+    setForeignValid(field) {
+      if (field) {
+        field.valid = true;
+      }
+      this.foreignvalidate = true;
+    },
+    focus(type, tid, field, index) {
+      const prev = this.table[tid].rowactive;
+      if (prev !== index && prev !== 0 && this[type].length > prev && !this[type][prev].valid) {
+        this.delete(type, tid, prev);
+      }
+
+      if (prev !== index) {
+        if (type === 'fields') {
+          const opt = {
+            index,
+            default: field.default,
+            comment: field.comment,
+            unsigned: field.unsigned,
+            autoincrement: field.autoincrement,
+          };
+          this.$emit('update:options', opt);
+        }
+
+        this.table[tid].rowactive = index;
+      }
+    },
+    delete(type, tid, idx) {
+      this[type].splice(idx, 1);
+      this.setValid();
+
+      const nidx = idx > 0 ? idx - 1 : 0;
+
+      if (this[type].length === 0) {
+        const self = this;
+        setTimeout(() => {
+          self.add(type, tid, 0);
+        }, 10);
+      } else {
+        this.focus(type, tid, this[type][nidx], nidx);
+      }
+    },
+    add(type, tid, idx) {
+      let props, name;
+      switch (type) {
+        case 'fields':
+          name = 'field';
+          props = {
+            name: '',
+            type: 'string',
+            total: 0,
+            decimal: 0,
+            allownull: false,
+            pk: false,
+            default: '',
+            comment: '',
+            unsigned: false,
+            autoincrement: false,
+            valid: false,
+          };
+          break;
+        case 'indexes':
+          name = 'index';
+          props = {
+            name: '',
+            fields: '',
+            type: 'index',
+            valid: false,
+          };
+          break;
+        case 'foreigns':
+          name = 'foreign';
+          props = {
+            name: '',
+            fields: '',
+            reftable: '',
+            reffields: '',
+            ondelete: '',
+            onupdate: '',
+            valid: false,
+          };
+          break;
+      }
+      let add = false;
+      if (this[name + 'validate']) {
+        this[type].splice(idx, 0, props);
+        this[name + 'validate'] = false;
+        add = true;
+      }
+
+      setTimeout(() => {
+        if (!add) {
+          idx = (this[type].length > 0) ? this[type].length - 1 : 0;
+        }
+        const id = `${name}_${idx}`;
+        const el = document.getElementById(id);
+
+        if (el) {
+          el.click();
+          el.focus();
+        }
+      }, 100);
+    },
+    setValid(field) {
+      if (field) {
+        field.valid = true;
+      }
+      this.fieldvalidate = true;
     },
   },
 };
