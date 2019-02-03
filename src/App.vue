@@ -143,6 +143,7 @@
 </template>
 
 <script>
+/* eslint-disable no-param-reassign */
 import axios from 'axios';
 import Result from '@/components/Result';
 

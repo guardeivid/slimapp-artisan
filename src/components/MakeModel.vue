@@ -143,6 +143,7 @@
 </template>
 
 <script>
+/* eslint-disable no-param-reassign */
 export default {
   name: 'MakeModel',
   props: ['config'],

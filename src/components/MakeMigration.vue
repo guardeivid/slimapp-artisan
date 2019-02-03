@@ -22,15 +22,20 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md mb-3">
-        <div class="mb-3">
-            <label for="tablename">Nombre de la tabla</label>
-            <input type="text" class="form-control" id="tablename" v-model="data.table" @change="command"
-              />
+      <div class="col-md-9 mb-3">
+        <label for="tablename">Nombre de la tabla</label>
+        <input type="text" class="form-control" id="tablename" v-model="data.table" @change="setTableName"
+          />
+      </div>
+      <div class="col-md-3 d-flex align-items-end">
+        <div class="custom-control custom-checkbox mb-4 ml-2">
+          <input type="checkbox" class="custom-control-input" v-model="data.custom" id="custom" @change="upcommand" :disabled="!custom">
+          <label class="custom-control-label" for="custom"> Personalizar Tabla
+          </label>
         </div>
       </div>
     </div>
-    <design-table :fields="data.fields" :options.sync="options" @updateOtionsParent="updateOptions" :indexes="data.indexes" :foreigns="data.foreigns">
+    <design-table :fields="data.fields" :options.sync="options" @updateOtionsParent="updateOptions" :indexes="data.indexes" :foreigns="data.foreigns" v-if="data.custom">
     </design-table>
     <div class="row">
       <div class="col-md-6 mb-3 d-flex align-items-center">
@@ -70,13 +75,17 @@ export default {
           type: 'string',
           total: 0,
           decimal: 0,
-          allownull: false,
+          nullable: false,
           pk: false,
           default: '',
           comment: '',
           unsigned: false,
           autoincrement: false,
+          srid: -1,
           valid: false,
+          ispk: true,
+          isfun: false,
+          isnull: false,
         }],
         indexes: [{
           name: '',
@@ -94,6 +103,7 @@ export default {
           valid: false,
         }],
       },
+      custom: false,
     };
   },
   methods: {
@@ -104,11 +114,18 @@ export default {
         cmd += `${this.data.name} --${this.data.type}=${this.data.table}`;
 
         if (this.data.custom) {
+          this.setSchema();
           cmd += ` --schema=${this.data.schema}`;
         }
       }
 
       this.$parent.addCommand(cmd);
+    },
+    upcommand() {
+      const self = this;
+      setTimeout(() => {
+        self.command();
+      }, 100);
     },
     submit() {
       if (!this.data.name) {
@@ -123,6 +140,63 @@ export default {
       field.comment = this.options.comment;
       field.unsigned = this.options.unsigned;
       field.autoincrement = this.options.autoincrement;
+    },
+    setTableName() {
+      this.custom = this.data.table !== '';
+      if (!this.custom) {
+        this.data.custom = false;
+      }
+      this.upcommand();
+    },
+    setSchema() {
+      let schema = [];
+      for (let i = 0, n = this.data.fields.length; i < n; i += 1) {
+        const field = this.data.fields[i];
+        if (!field.valid) continue;
+
+        if (field.isfun) {
+          schema.push(`${field.type}:fx`);
+          continue;
+        }
+
+        let str = `${field.name}:${field.type}`;
+
+        if (this.$children[0].isDate(field.type) && field.total > 0 && field.total <= 10) {
+          str += `(${field.total})`;
+        } else if (this.$children[0].isGeometry(field.type)) {
+          str += `(${field.srid})`;
+        } else {
+          if (parseInt(field.total, 10) !== 0) {
+            str += `(${field.total}`;
+            if (this.$children[0].isDecimal(field.type) &&
+              parseInt(field.decimal, 10) !== 0) {
+              str += `,${field.decimal}`;
+            }
+            str += ')';
+          }
+        }
+
+        if (!this.$children[0].isIncrements(field.type) &&
+          !this.$children[0].isUnsigned(field.type)) {
+          str += field.unsigned ? ':unsigned' : '';
+        }
+        if (!this.$children[0].isIncrements(field.type)) {
+          str += field.nullable ? ':nullable' : '';
+          str += field.autoincrement ? ':autoIncrement' : '';
+          if (field.default) {
+            if (isNaN(field.default)) {
+              str += `:default('${field.default}')`;
+            } else {
+              str += `:default(${field.default})`;
+            }
+          }
+        }
+
+        str += field.comment ? `:comment('${field.comment}')` : '';
+
+        schema.push(str);
+      }
+      this.data.schema = schema.join(', ');
     },
   },
 };

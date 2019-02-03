@@ -43,7 +43,13 @@
                     <fa-icon icon="caret-right" class="rowactive" v-if="index === table[0].rowactive"/>
                   </td>
                   <td>
-                    <input :id="'field_'+index" type="text" class="form-control form-control-sm material" required v-model="field.name" :class="{ 'border border-danger': !field.name }" @change="setValid('fields', field)" />
+                    <input
+                      :id="'field_'+index" type="text" required
+                      class="form-control form-control-sm material"
+                      :class="{ 'border border-danger': !field.name && !field.isfun }"
+                      v-model="field.name"
+                      @change="setValid('fields', field)"
+                      :disabled="field.isfun" />
                   </td>
                   <td>
                     <select class="form-control form-control-sm material" required v-model="field.type" @change="fieldType(field)">
@@ -60,13 +66,13 @@
                   </td>
                   <td>
                     <div class="custom-control custom-checkbox mb-3 ml-2">
-                      <input type="checkbox" class="custom-control-input" v-model="field.allownull" @change="command" :id="`allownull_${index}`">
-                      <label class="custom-control-label" :for="`allownull_${index}`"> </label>
+                      <input type="checkbox" class="custom-control-input" v-model="field.nullable" @change="command" :id="`nullable_${index}`" :disabled="field.isnull">
+                      <label class="custom-control-label" :for="`nullable_${index}`"> </label>
                     </div>
                   </td>
                   <td>
                     <div class="custom-control custom-checkbox mb-3 ml-2">
-                      <input type="checkbox" class="custom-control-input" v-model="field.pk" @change="command" :id="`pk_${index}`">
+                      <input type="checkbox" class="custom-control-input" v-model="field.pk" @change="command" :id="`pk_${index}`" :disabled="!field.ispk">
                       <label class="custom-control-label" :for="`pk_${index}`"> </label>
                     </div>
                   </td>
@@ -92,7 +98,7 @@
               </div>
               <div class="col-md-4">
                 <div class="custom-control custom-checkbox mb-3 ml-2">
-                  <input type="checkbox" class="custom-control-input" v-model="options.autoincrement"  @change="updateOptions" id="inputautoincrement">
+                  <input type="checkbox" class="custom-control-input" v-model="options.autoincrement"  @change="updateOptions" id="inputautoincrement" :disabled="!isauto">
                   <label class="custom-control-label" for="inputautoincrement"> Auto-incrementing
                   </label>
                 </div>
@@ -109,7 +115,7 @@
               </div>
               <div class="col-md-4">
                 <div class="custom-control custom-checkbox mb-3 ml-2">
-                  <input type="checkbox" class="custom-control-input" v-model="options.unsigned"  @change="updateOptions" id="inputunsigned">
+                  <input type="checkbox" class="custom-control-input" v-model="options.unsigned"  @change="updateOptions" id="inputunsigned" :disabled="!isunsign">
                   <label class="custom-control-label" for="inputunsigned"> Unsigned
                   </label>
                 </div>
@@ -211,6 +217,7 @@
 </template>
 
 <script>
+/* eslint-disable no-param-reassign */
 import DesignField from '@/components/DesignFields';
 
 export default {
@@ -285,6 +292,8 @@ export default {
         { rowactive: 0 },
         { rowactive: 0 },
       ],
+      isauto: false,
+      isunsign: false,
       fieldvalidate: false,
       indexTypes: ['primary', 'unique', 'index', 'spatialIndex'],
       indexvalidate: false,
@@ -293,29 +302,105 @@ export default {
     };
   },
   methods: {
-    command(e) {
-      console.log(e);
+    command() {
+      this.$parent.command();
     },
     fieldType(field) {
-      if (field.type)
+      field.ispk = true;
+      field.isfun = false;
+      field.isnull = false;
+      this.isunsign = false;
+      this.isauto = false;
+      if (this.isIncrements(field.type)) {
+        field.default = '';
+        field.unsigned = true;
+        field.autoincrement = true;
+        field.pk = true;
+        field.ispk = false;
+        field.nullable = false;
+        field.isnull = true;
+      } else if (this.isUnsigned(field.type)) {
+        field.unsigned = true;
+        field.autoincrement = false;
+        this.isauto = true;
+      } else if (this.isNumber(field.type)) {
+        this.isauto = true;
+        this.isunsign = true;
+      } else if (this.isDate(field.type)) {
+        field.unsigned = false;
+        field.autoincrement = false;
+        field.pk = false;
+      } else if (this.isFunctions(field.type)) {
+        field.name = '';
+        field.unsigned = false;
+        field.autoincrement = false;
+        field.pk = false;
+        field.ispk = false;
+        field.isfun = true;
+        field.valid = true;
+        this.fieldvalidate = true;
+      } else if (this.isGeometry(field.type)) {
+        field.unsigned = false;
+        field.autoincrement = false;
+        field.pk = false;
+      } else if (field.type === 'enum') {
+        field.unsigned = false;
+        field.autoincrement = false;
+        field.pk = false;
+        field.ispk = false;
+      } else {
+        field.unsigned = false;
+        field.autoincrement = false;
+        field.pk = false;
+      }
+      const idx = this.table[0].rowactive;
+      this.focus('fields', 0, field, idx, true);
+
+      this.command();
+    },
+    isFunctions(type) {
+      const functions = ['morphs', 'nullableMorphs', 'nullableTimestamps', 'rememberToken', 'softDeletes', 'softDeletesTz', 'timestamps', 'timestampsTz'];
+      return functions.indexOf(type) !== -1;
+    },
+    isDate(type) {
+      const dates = ['date', 'dateTime', 'dateTimeTz', 'time', 'timeTz', 'timestamp', 'timestampTz', 'year'];
+      return dates.indexOf(type) !== -1;
+    },
+    isIncrements(type) {
+      const increments = ['bigIncrements', 'increments', 'mediumIncrements', 'smallIncrements', 'tinyIncrements'];
+      return increments.indexOf(type) !== -1;
+    },
+    isGeometry(type) {
+      const geometries = ['geometry', 'geometryCollection', 'lineString', 'multiLineString', 'multiPoint', 'point', 'polygon'];
+      return geometries.indexOf(type) !== -1;
+    },
+    isUnsigned(type) {
+      const unsigneds = ['unsignedBigInteger', 'unsignedDecimal', 'unsignedInteger', 'unsignedMediumInteger', 'unsignedSmallInteger', 'unsignedTinyInteger'];
+      return unsigneds.indexOf(type) !== -1;
     },
     isNumber(type) {
-      const numbers = ['bigInteger','decimal','double','float','integer','mediumInteger','smallInteger'];
-      return numbers.indexOf("type") === -1 ? false : true;
+      const numbers = ['bigInteger', 'decimal', 'double', 'float', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
+      return numbers.indexOf(type) !== -1;
+    },
+    isDecimal(type) {
+      const numbers = ['decimal', 'double', 'float'];
+      return numbers.indexOf(type) !== -1;
     },
     updateOptions() {
       this.$emit('updateOtionsParent');
+      this.command();
     },
-    focus(type, tid, field, index) {
+    focus(type, tid, field, index, silent) {
       const prev = this.table[tid].rowactive;
       if (prev !== index && prev !== 0 && this[type].length > prev && !this[type][prev].valid) {
         this.remove(type, tid, prev);
       }
 
-      if (prev !== index) {
+      if (prev !== index || silent) {
         if (type === 'fields') {
           const opt = {
             index,
+            pk: field.pk,
             default: field.default,
             comment: field.comment,
             unsigned: field.unsigned,
@@ -340,9 +425,11 @@ export default {
         }, 10);
       } else {
         this.focus(type, tid, this[type][nidx], nidx);
+        this.command();
       }
     },
     add(type, idx) {
+      const self = this;
       const [name, props] = this.get(type);
       let add = false;
       if (this[`${name}validate`]) {
@@ -353,7 +440,7 @@ export default {
 
       setTimeout(() => {
         if (!add) {
-          idx = (this[type].length > 0) ? this[type].length - 1 : 0;
+          idx = (self[type].length > 0) ? self[type].length - 1 : 0;
         }
         const id = `${name}_${idx}`;
         const el = document.getElementById(id);
@@ -362,14 +449,22 @@ export default {
           el.click();
           el.focus();
         }
+        self.command();
       }, 100);
     },
     setValid(type, field) {
       if (field) {
-        field.valid = true;
+        if (type === 'fields') {
+          field.valid = field.name !== '';
+        } else if (type === 'indexes') {
+          field.valid = field.fields !== '';
+        } else if (type === 'foreigns') {
+          field.valid = field.fields !== '' && field.reftable !== '' && field.reffields !== '';
+        }
       }
       const [name, props] = this.get(type);
       this[`${name}validate`] = true;
+      this.command();
     },
     get(type) {
       let props;
@@ -382,13 +477,17 @@ export default {
             type: 'string',
             total: 0,
             decimal: 0,
-            allownull: false,
+            nullable: false,
             pk: false,
             default: '',
             comment: '',
             unsigned: false,
             autoincrement: false,
+            srid: -1,
             valid: false,
+            ispk: true,
+            isfun: false,
+            isnull: false,
           };
           break;
         case 'indexes':
