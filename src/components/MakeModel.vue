@@ -255,10 +255,8 @@ export default {
           } else {
             if (this.data.fillable) {
               cmd += ` --fillable=${this.data.fillable}`;
-            } else {
-              if (this.data.guarded !== '*') {
+            } else if (this.data.guarded !== '*') {
                 cmd += ` --guarded=${this.data.guarded}`;
-              }
             }
           }
         }

@@ -243,20 +243,18 @@ export default {
           const cmd = self.result.notes[0];
           if (response.data.notes) {
             self.result.notes = [cmd, '&nbsp;', ...response.data.notes];
+          } else if (self.config.console) {
+            let info = response.data.info || [];
+            info = info.map(e => `<info>${e}</info>`);
+
+            let error = response.data.error || [];
+            error = error.map(e => `<critical>${e}</critical>`);
+
+            self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes, ...info, ...error] : [cmd, '&nbsp;', ...info, ...error];
           } else {
-            if (self.config.console) {
-              let info = response.data.info || [];
-              info = info.map((e) => { return `<info>${e}</info>`; });
-
-              let error = response.data.error || [];
-              error = error.map((e) => { return `<critical>${e}</critical>`; });
-
-              self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes, ...info, ...error] : [cmd, '&nbsp;', ...info, ...error];
-            } else {
-              self.result.info = response.data.info || [];
-              self.result.error = response.data.error || [];
-              self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes] : [cmd, '&nbsp;'];
-            }
+            self.result.info = response.data.info || [];
+            self.result.error = response.data.error || [];
+            self.result.notes = response.data.notes ? [cmd, '&nbsp;', ...response.data.notes] : [cmd, '&nbsp;'];
           }
 
           if (callback) {

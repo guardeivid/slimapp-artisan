@@ -149,55 +149,96 @@ export default {
       this.upcommand();
     },
     setSchema() {
-      let schema = [];
+      const schema = [];
+
       for (let i = 0, n = this.data.fields.length; i < n; i += 1) {
         const field = this.data.fields[i];
-        if (!field.valid) continue;
+        if (field.valid) {
+          if (field.isfun) {
+            schema.push(`${field.type}:fx`);
+          } else {
+            let str = `${field.name}:${field.type}`;
 
-        if (field.isfun) {
-          schema.push(`${field.type}:fx`);
-          continue;
-        }
-
-        let str = `${field.name}:${field.type}`;
-
-        if (this.$children[0].isDate(field.type) && field.total > 0 && field.total <= 10) {
-          str += `(${field.total})`;
-        } else if (this.$children[0].isGeometry(field.type)) {
-          str += `(${field.srid})`;
-        } else {
-          if (parseInt(field.total, 10) !== 0) {
-            str += `(${field.total}`;
-            if (this.$children[0].isDecimal(field.type) &&
-              parseInt(field.decimal, 10) !== 0) {
-              str += `,${field.decimal}`;
-            }
-            str += ')';
-          }
-        }
-
-        if (!this.$children[0].isIncrements(field.type) &&
-          !this.$children[0].isUnsigned(field.type)) {
-          str += field.unsigned ? ':unsigned' : '';
-        }
-        if (!this.$children[0].isIncrements(field.type)) {
-          str += field.nullable ? ':nullable' : '';
-          str += field.autoincrement ? ':autoIncrement' : '';
-          if (field.default) {
-            if (isNaN(field.default)) {
-              str += `:default('${field.default}')`;
+            if (this.$children[0].isDate(field.type) && field.total > 0 && field.total <= 10) {
+              str += `(${field.total})`;
+            } else if (this.$children[0].isGeometry(field.type)) {
+              str += `(${field.srid})`;
             } else {
-              str += `:default(${field.default})`;
+              if (parseInt(field.total, 10) !== 0) {
+                str += `(${field.total}`;
+                if (this.$children[0].isDecimal(field.type) &&
+                  parseInt(field.decimal, 10) !== 0) {
+                  str += `,${field.decimal}`;
+                }
+                str += ')';
+              }
             }
+
+            if (!this.$children[0].isIncrements(field.type) &&
+              !this.$children[0].isUnsigned(field.type)) {
+              str += field.unsigned ? ':unsigned' : '';
+            }
+            if (!this.$children[0].isIncrements(field.type)) {
+              str += field.nullable ? ':nullable' : '';
+              str += field.autoincrement ? ':autoIncrement' : '';
+              if (field.default) {
+                if (isNaN(field.default)) {
+                  str += `:default('${field.default}')`;
+                } else {
+                  str += `:default(${field.default})`;
+                }
+              }
+            }
+
+            str += field.comment ? `:comment('${field.comment}')` : '';
+
+            schema.push(str);
           }
         }
-
-        str += field.comment ? `:comment('${field.comment}')` : '';
-
-        schema.push(str);
       }
+
+      for (let i = 0, n = this.data.indexes.length; i < n; i += 1) {
+        const index = this.data.indexes[i];
+        if (index.valid) {
+          let str = '';
+          const flds = index.fields.split(', ');
+          if (flds.length > 1) {
+            str += `${index.type}:index(['${flds.join('\', \'')}']`;
+          } else {
+            str += `${index.type}:index('${index.fields}'`;
+          }
+
+          str += index.name ? `, '${index.name}'` : '';
+          str += ')';
+
+          schema.push(str);
+        }
+      }
+
+      for (let i = 0, n = this.data.foreigns.length; i < n; i += 1) {
+        const foreign = this.data.foreigns[i];
+        if (foreign.valid) {
+          let str = '';
+          const flds = foreign.fields.split(', ');
+          if (flds.length > 1) {
+            str += `:foreign(['${flds.join('\', \'')}']`;
+          } else {
+            str += `:foreign('${foreign.fields}'`;
+          }
+
+          str += foreign.name ? `, '${foreign.name}'` : '';
+          str += `):references('${foreign.reffields}'):on('${foreign.reftable}')`;
+
+          str += foreign.ondelete ? `:onDelete('${foreign.ondelete}')` : '';
+          str += foreign.onupdate ? `:onUpdate('${foreign.onupdate}')` : '';
+
+          schema.push(str);
+        }
+      }
+
       this.data.schema = schema.join(', ');
     },
+
   },
 };
 </script>

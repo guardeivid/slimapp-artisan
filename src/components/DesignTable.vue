@@ -147,7 +147,7 @@
                     </design-field>
                   </td>
                   <td>
-                    <select class="form-control form-control-sm material" required v-model="field.type">
+                    <select class="form-control form-control-sm material" required v-model="field.type" @change="command">
                       <option v-for="type in indexTypes" :key="type" :value="type">
                         {{ type }}
                       </option>
@@ -185,13 +185,13 @@
                     </design-field>
                   </td>
                   <td>
-                    <input type="text" class="form-control form-control-sm material" required v-model="field.reftable" @change="command" :class="{ 'border border-danger': !field.reftable }" />
+                    <input type="text" class="form-control form-control-sm material" required v-model="field.reftable" @change="setValid('foreigns', field)" :class="{ 'border border-danger': !field.reftable }" />
                   </td>
                   <td>
-                    <input type="text" class="form-control form-control-sm material" required v-model="field.reffields" @change="command" :class="{ 'border border-danger': !field.reffields }" />
+                    <input type="text" class="form-control form-control-sm material" required v-model="field.reffields" @change="setValid('foreigns', field)" :class="{ 'border border-danger': !field.reffields }" />
                   </td>
                   <td>
-                    <select class="form-control form-control-sm material" v-model="field.ondelete">
+                    <select class="form-control form-control-sm material" v-model="field.ondelete" @change="command">
                       <option></option>
                       <option v-for="action in actions" :key="action" :value="action">
                         {{ action }}
@@ -199,7 +199,7 @@
                     </select>
                   </td>
                   <td>
-                    <select class="form-control form-control-sm material" v-model="field.onupdate">
+                    <select class="form-control form-control-sm material" v-model="field.onupdate" @change="command">
                       <option></option>
                       <option v-for="action in actions" :key="action" :value="action">
                         {{ action }}
@@ -322,8 +322,12 @@ export default {
       } else if (this.isUnsigned(field.type)) {
         field.unsigned = true;
         field.autoincrement = false;
+        field.pk = false;
         this.isauto = true;
       } else if (this.isNumber(field.type)) {
+        field.unsigned = false;
+        field.autoincrement = false;
+        field.pk = false;
         this.isauto = true;
         this.isunsign = true;
       } else if (this.isDate(field.type)) {
