@@ -149,6 +149,14 @@ export default {
       this.upcommand();
     },
     setSchema() {
+      const fields = this.getFieldsSchema();
+      const indexes = this.getIndexesSchema();
+      const foreigns = this.getForeignsSchema();
+      const schema = [...fields, ...indexes, ...foreigns];
+
+      this.data.schema = schema.join(', ');
+    },
+    getFieldsSchema() {
       const schema = [];
 
       for (let i = 0, n = this.data.fields.length; i < n; i += 1) {
@@ -197,23 +205,33 @@ export default {
         }
       }
 
+      return schema;
+    },
+    getIndexesSchema() {
+      const schema = [];
+
       for (let i = 0, n = this.data.indexes.length; i < n; i += 1) {
         const index = this.data.indexes[i];
         if (index.valid) {
           let str = '';
           const flds = index.fields.split(', ');
           if (flds.length > 1) {
-            str += `${index.type}:index(['${flds.join('\', \'')}']`;
+            str += `${index.type}:index(['${flds.join('\',\'')}']`;
           } else {
             str += `${index.type}:index('${index.fields}'`;
           }
 
-          str += index.name ? `, '${index.name}'` : '';
+          str += index.name ? `,'${index.name}'` : '';
           str += ')';
 
           schema.push(str);
         }
       }
+
+      return schema;
+    },
+    getForeignsSchema() {
+      const schema = [];
 
       for (let i = 0, n = this.data.foreigns.length; i < n; i += 1) {
         const foreign = this.data.foreigns[i];
@@ -221,12 +239,12 @@ export default {
           let str = '';
           const flds = foreign.fields.split(', ');
           if (flds.length > 1) {
-            str += `:foreign(['${flds.join('\', \'')}']`;
+            str += `:foreign(['${flds.join('\',\'')}']`;
           } else {
             str += `:foreign('${foreign.fields}'`;
           }
 
-          str += foreign.name ? `, '${foreign.name}'` : '';
+          str += foreign.name ? `,'${foreign.name}'` : '';
           str += `):references('${foreign.reffields}'):on('${foreign.reftable}')`;
 
           str += foreign.ondelete ? `:onDelete('${foreign.ondelete}')` : '';
@@ -236,9 +254,8 @@ export default {
         }
       }
 
-      this.data.schema = schema.join(', ');
+      return schema;
     },
-
   },
 };
 </script>
