@@ -153,13 +153,14 @@ export default {
     Result,
   },
   created() {
+    //this.host = location.href;
     this.fetchModels();
     this.fetchSeeds();
   },
   data() {
     return {
       title: 'Dashboard',
-      host: 'http://localhost/slimapp/artisan', // location.href,
+      host: 'http://localhost/slimapp/artisan', //''
       config: {
         slim: false,
         fill: true,
